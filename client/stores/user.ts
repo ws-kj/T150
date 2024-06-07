@@ -26,6 +26,7 @@ export const useUserStore = defineStore(
     };
 
     const loginUser = async (username: string, password: string) => {
+      console.log("Here store");
       await fetchy("/api/login", "POST", {
         body: { username: username, password: password },
       });
