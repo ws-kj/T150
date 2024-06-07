@@ -61,6 +61,7 @@ class Routes {
 
   @Router.post("/login")
   async logIn(session: WebSessionDoc, username: string, password: string) {
+    console.log("Loggin");
     const u = await User.authenticate(username, password);
     WebSession.start(session, u._id);
     return { msg: "Logged in!" };

@@ -121,6 +121,7 @@ let Routes = (() => {
             }
             logIn(session, username, password) {
                 return __awaiter(this, void 0, void 0, function* () {
+                    console.log("Loggin");
                     const u = yield app_1.User.authenticate(username, password);
                     app_1.WebSession.start(session, u._id);
                     return { msg: "Logged in!" };
