@@ -41,7 +41,7 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
 
 body {
   font-family: "Roboto", sans-serif; /* Applying the Roboto font */
-  background-color: #e0f7fa; /* Light athletic background color */
+  background-color: rgba(224, 247, 250, 0.8); /* Light athletic background color with transparency */
   margin: 0; /* Removes default margin */
   display: flex;
   justify-content: center;
@@ -83,7 +83,7 @@ h1 {
 }
 
 .box {
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.8); /* White with slight transparency */
   border-radius: 15px;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
   padding: 2em;

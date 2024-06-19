@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 
-import { User, WebSession, Workout, Record } from "./app";
+import { User, WebSession, Workout, Meter, PR } from "./app";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
 import { WorkoutDoc } from "concepts/workout";
@@ -41,7 +41,7 @@ class Routes {
   async createUser(session: WebSessionDoc, username: string, password: string, profilePhoto: string, code: string) {
     WebSession.isLoggedOut(session);
     const user = await User.create(username, password, profilePhoto, code);
-    await Record.create(user.user.username);
+    await Meter.create(user.user.username);
     return user.user;
   }
 
@@ -54,8 +54,11 @@ class Routes {
   @Router.delete("/users")
   async deleteUser(session: WebSessionDoc) {
     const user = WebSession.getUser(session);
-
     WebSession.end(session);
+    await Workout.deleteByAthlete(user);
+    const username = (await User.getUserById(user)).username;
+    await PR.deleteByRower(username);
+    await Meter.delete(username);
     return await User.delete(user);
   }
 
@@ -87,9 +90,21 @@ class Routes {
   }
 
   @Router.post("/workouts")
-  async createWorkout(session: WebSessionDoc, type: string, meter: string, workoutDate: string) {
+  async createWorkout(session: WebSessionDoc, type: string, meter: string, workoutDate: string, description: string) {
     const user = WebSession.getUser(session);
-    const created = await Workout.create(user, type, Number(meter), workoutDate);
+    const created = await Workout.create(user, type, Number(meter), workoutDate, description);
+    // Updating meters
+    const username = (await User.getUserById(user)).username;
+    const workouts = await Workout.getByAthlete(user);
+    let totalMeter = 0;
+    for (const workout of workouts) {
+      if (workout.type === "erg") {
+        totalMeter += workout.meter * 1;
+      } else {
+        totalMeter += workout.meter * 2;
+      }
+    }
+    await Meter.update(username, { meter: totalMeter });
     return { msg: created.msg, post: await Responses.workout(created.workout) };
   }
 
@@ -97,13 +112,39 @@ class Routes {
   async updateWorkout(session: WebSessionDoc, _id: ObjectId, update: Partial<WorkoutDoc>) {
     const user = WebSession.getUser(session);
     await Workout.isAthlete(user, _id);
-    return await Workout.update(_id, update);
+    await Workout.update(_id, update);
+    // Updating meters
+    const username = (await User.getUserById(user)).username;
+    const workouts = await Workout.getByAthlete(user);
+    let totalMeter = 0;
+    for (const workout of workouts) {
+      if (workout.type === "erg") {
+        totalMeter += workout.meter * 1;
+      } else {
+        totalMeter += workout.meter * 2;
+      }
+    }
+    await Meter.update(username, { meter: totalMeter });
+    return;
   }
 
   @Router.delete("/workouts/:_id")
   async deleteWorkout(session: WebSessionDoc, _id: ObjectId) {
     const user = WebSession.getUser(session);
     await Workout.isAthlete(user, _id);
+    // Updating meters
+    const username = (await User.getUserById(user)).username;
+    const workouts = await Workout.getByAthlete(user);
+    let totalMeter = 0;
+    for (const workout of workouts) {
+      if (workout.type === "erg") {
+        totalMeter += workout.meter * 1;
+      } else {
+        totalMeter += workout.meter * 2;
+      }
+    }
+    await Meter.update(username, { meter: totalMeter });
+
     return Workout.delete(_id);
   }
 
@@ -120,9 +161,47 @@ class Routes {
     return meter;
   }
 
-  @Router.get("/record")
+  @Router.get("/ranking")
   async getAllMeter() {
-    return Record.getRecords({});
+    return Meter.getMeters({});
+  }
+
+  @Router.post("/prs/:type")
+  async postPR(session: WebSessionDoc, type: string, pr: string) {
+    const user = WebSession.getUser(session);
+    const username = (await User.getUserById(user)).username;
+    const created = await PR.create(username, type, pr);
+    return created;
+  }
+
+  @Router.get("/prs/:type")
+  async getPRs(type: string) {
+    const prs = await PR.getPRs({ type });
+    return prs;
+  }
+
+  @Router.get("/prs")
+  async getPRsByUsername(session: WebSessionDoc) {
+    console.log("here");
+    const user = WebSession.getUser(session);
+    const username = (await User.getUserById(user)).username;
+    console.log(username);
+    const prs = await PR.getByRower(username);
+    return prs;
+  }
+
+  async updateMeters(user: ObjectId) {
+    const username = (await User.getUserById(user)).username;
+    const workouts = await Workout.getByAthlete(user);
+    let totalMeter = 0;
+    for (const workout of workouts) {
+      if (workout.type === "erg") {
+        totalMeter += workout.meter * 1;
+      } else {
+        totalMeter += workout.meter * 2;
+      }
+    }
+    await Meter.update(username, { meter: totalMeter });
   }
 }
 

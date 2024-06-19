@@ -2,138 +2,154 @@
 import { useUserStore } from "@/stores/user";
 import { fetchy } from "@/utils/fetchy";
 import { storeToRefs } from "pinia";
-import { onBeforeMount, ref, watch } from "vue";
+import { onBeforeMount, ref } from "vue";
+import router from "@/router";
+import PRViewComponent from "../components/Record/PRViewComponent.vue";
+import TwoKForm from "../components/Record/TwoKForm.vue";
+import SixKForm from "../components/Record/SixKForm.vue";
+import BenchPressForm from "../components/Record/BenchPressForm.vue";
+import SquatForm from "../components/Record/SquatForm.vue";
 
-const { currentUsername, isLoggedIn, currentUserProfilePhoto } = storeToRefs(useUserStore());
+const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
+const { deleteUser } = useUserStore();
 
 const props = defineProps(["username"]);
-const picture = ref("");
 const totalMeter = ref(0);
+const PRs = ref<Array<Record<string, string>>>([]);
 
 async function fetchData() {
   try {
     totalMeter.value = await fetchy("/api/meter", "GET");
+    PRs.value = await fetchy("/api/prs", "GET");
   } catch (e) {
     console.log(e);
   }
 }
 
-async function getProfilePicture(username: string) {
-  let pictureResults;
-  try {
-    pictureResults = (await fetchy(`/api/users/${username}`, "GET")).profilePhoto;
-  } catch (_) {
-    return;
-  }
-  picture.value = pictureResults;
+async function delete_() {
+  await deleteUser();
+  void router.push({ name: "Home" });
 }
 
 onBeforeMount(async () => {
-  if (isLoggedIn && props.username == currentUsername.value) {
-    picture.value = currentUserProfilePhoto.value;
-  } else {
-    await getProfilePicture(props.username);
-  }
   await fetchData();
-  watch(
-    () => props.username,
-    async () => {
-      await getProfilePicture(props.username);
-    },
-  );
 });
 </script>
 
 <template>
   <div class="full-wrapper">
     <div class="profile-wrapper">
-      <img v-bind:src="picture" />
-      <p class="username">{{ props.username }}</p>
-      <p>Total meter: {{ totalMeter }}</p>
-      <RouterLink v-if="isLoggedIn && props.username == currentUsername" class="settings" :to="{ name: 'Settings' }">
-        <button class="button-secondary pure-button">Settings</button>
-      </RouterLink>
+      <div class="profile-info">
+        <p class="username">{{ props.username }}</p>
+        <p>Total meters: {{ totalMeter }}</p>
+        <RouterLink v-if="isLoggedIn && props.username == currentUsername" class="settings" :to="{ name: 'Settings' }">
+          <!-- <button class="button-secondary pure-button">Settings</button> -->
+          <button class="button-error pure-button" @click="delete_">Delete User</button>
+        </RouterLink>
+      </div>
+      <div class="pr-list">
+        <h3>Personal Records</h3>
+        <article v-for="pr in PRs" :key="pr._id" class="pr-item">
+          <PRViewComponent :pr="pr" />
+        </article>
+      </div>
+    </div>
+    <div class="forms-wrapper">
+      <TwoKForm />
+      <SixKForm />
+      <BenchPressForm />
+      <SquatForm />
     </div>
   </div>
 </template>
 
 <style scoped>
-p {
-  background-color: var(--light-orange-gold);
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap");
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css");
+
+body {
+  font-family: "Roboto", sans-serif;
+  background-color: #e0f7fa;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 
 .full-wrapper {
-  background: var(--darker-bg);
   padding: 2em;
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 
-h2 {
-  color: var(--font-color);
-  margin-left: 1em;
+.profile-wrapper {
+  background-color: #ffffff;
+  border: 2px solid #00796b;
+  border-radius: 10px;
+  padding: 1em;
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 2em;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.profile-info {
+  margin-bottom: 1em;
 }
 
 .username {
   font-weight: bold;
-  font-size: 1.2em;
-  border-bottom-style: solid;
-  border-bottom-color: var(--underline-color);
+  font-size: 1.5em;
+  color: #00796b;
+  margin-bottom: 0.5em;
 }
 
-.profile-wrapper {
-  background-color: var(--light-orange-gold);
-  border: 3px solid var(--deep-gold);
-  border-radius: 1em;
+button {
+  padding: 0.5em 1em;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.button-secondary {
+  background-color: #00796b;
+  color: white;
+}
+
+.button-secondary:hover {
+  background-color: #005f56;
+}
+
+.button-error {
+  background-color: #d32f2f;
+  color: white;
+}
+
+.button-error:hover {
+  background-color: #b71c1c;
+}
+
+.pr-list {
+  margin-top: 2em;
+}
+
+.pr-item {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 10px;
   padding: 1em;
+  margin-bottom: 1em;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.logged-out {
-  text-align: center;
-}
-
-h3 {
-  text-align: center;
-  margin-bottom: 0;
-}
-
-.split-wrapper {
+.forms-wrapper {
   display: flex;
-}
-
-/* Split the screen in half */
-.split {
-  float: left;
-  background: var(--darker-bg);
-}
-
-/* Control the left side */
-.left {
-  height: 100%;
-  width: 75%;
-}
-
-/* Control the right side */
-.right {
-  flex-grow: 1;
-}
-
-.settings {
-  float: right;
-}
-
-img {
-  width: 5vw;
-  height: 5vw;
-  object-fit: cover;
-  align-self: auto;
-  border: 3px solid var(--deep-gold);
-  border-radius: 16px;
-  display: block;
-  margin-right: 0.5rem;
-  min-height: 4.5em;
-  min-width: 4.5em;
-  max-height: 4.5em;
-  max-width: 4.5em;
+  flex-direction: column;
+  gap: 1em;
+  width: 100%;
+  max-width: 600px;
 }
 </style>

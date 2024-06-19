@@ -26,6 +26,7 @@ const deleteWorkout = async () => {
         <p class="workout-type"><i class="fas fa-dumbbell"></i> {{ props.workout.type }}</p>
       </div>
       <p class="meter"><i class="fas fa-running"></i> {{ props.workout.meter }} meters</p>
+      <p class="description"><i class="fas fa-pen"></i> {{ props.workout.description }}</p>
     </div>
     <div class="actions">
       <menu v-if="props.workout.athlete == currentUsername">
@@ -55,7 +56,7 @@ const deleteWorkout = async () => {
 
 .workout-details {
   display: flex;
-  align-items: center;
+  flex-direction: column;
 }
 
 .athlete-type {
@@ -81,9 +82,16 @@ const deleteWorkout = async () => {
   color: #555;
 }
 
+.description {
+  font-size: 1em;
+  color: #555;
+  margin-top: 10px;
+}
+
 .actions {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
 .menu {
@@ -125,6 +133,9 @@ const deleteWorkout = async () => {
 @media (max-width: 768px) {
   .workout {
     flex-direction: column;
+    align-items: flex-start;
+  }
+  .actions {
     align-items: flex-start;
   }
 }

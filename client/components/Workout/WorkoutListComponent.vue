@@ -66,8 +66,8 @@ onBeforeMount(async () => {
 <style scoped>
 :root {
   --primary-color: #3498db;
-  --base-bg: #f5f5f5;
-  --secondary-bg: #ffffff;
+  --base-bg: rgba(245, 245, 245, 0.8); /* Slightly transparent */
+  --secondary-bg: rgba(255, 255, 255, 0.8); /* Slightly transparent */
   --text-color: #333;
 }
 

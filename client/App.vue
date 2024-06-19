@@ -4,12 +4,19 @@ import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
 import { computed, onBeforeMount } from "vue";
 import { RouterLink, RouterView, useRoute } from "vue-router";
+import router from "@/router";
 
 const currentRoute = useRoute();
 const currentRouteName = computed(() => currentRoute.name);
 const userStore = useUserStore();
 const { currentUsername, isLoggedIn, currentUserProfilePhoto } = storeToRefs(userStore);
 const { toast } = storeToRefs(useToastStore());
+const { logoutUser } = useUserStore();
+
+async function logout() {
+  await logoutUser();
+  void router.push({ name: "Home" });
+}
 
 // Make sure to update the session before mounting the app in case the user is already logged in
 onBeforeMount(async () => {
@@ -31,9 +38,10 @@ onBeforeMount(async () => {
       <div class="dropdown">
         <button class="dropbtn">Menu</button>
         <div class="dropdown-content">
-          <RouterLink :to="{ name: 'Home' }" :class="{ underline: currentRouteName == 'Home' }">Home</RouterLink>
-          <RouterLink :to="{ name: 'Ranking' }">Records</RouterLink>
+          <RouterLink v-if="isLoggedIn" :to="{ name: 'Home' }" :class="{ underline: currentRouteName == 'Home' }">Home</RouterLink>
+          <RouterLink v-if="isLoggedIn" :to="{ name: 'Ranking' }">Ranking</RouterLink>
           <RouterLink v-if="isLoggedIn" :to="{ name: 'Profile', params: { username: currentUsername } }" :class="{ underline: currentRouteName == 'Profile' }">Profile</RouterLink>
+          <button v-if="isLoggedIn" class="pure-button pure-button-primary" @click="logout">Logout</button>
           <RouterLink v-if="!isLoggedIn" :to="{ name: 'Login' }" :class="{ underline: currentRouteName == 'Login' }">Login</RouterLink>
         </div>
       </div>

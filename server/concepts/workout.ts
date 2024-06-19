@@ -8,13 +8,14 @@ export interface WorkoutDoc extends BaseDoc {
   type: string;
   meter: number;
   workoutDate: string;
+  description: string;
 }
 
 export default class WorkoutConcept {
   public readonly workouts = new DocCollection<WorkoutDoc>("workouts");
 
-  async create(athlete: ObjectId, type: string, meter: number, workoutDate: string) {
-    const _id = await this.workouts.createOne({ athlete, type, meter, workoutDate });
+  async create(athlete: ObjectId, type: string, meter: number, workoutDate: string, description: string) {
+    const _id = await this.workouts.createOne({ athlete, type, meter, workoutDate, description });
     return { msg: "Workout successfully created!", workout: await this.workouts.readOne({ _id }) };
   }
 

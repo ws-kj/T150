@@ -67,6 +67,9 @@ let Routes = (() => {
     let _deleteWorkout_decorators;
     let _getMeter_decorators;
     let _getAllMeter_decorators;
+    let _postPR_decorators;
+    let _getPRs_decorators;
+    let _getPRsByUsername_decorators;
     return _a = class Routes {
             getSessionUser(session) {
                 return __awaiter(this, void 0, void 0, function* () {
@@ -102,7 +105,7 @@ let Routes = (() => {
                 return __awaiter(this, void 0, void 0, function* () {
                     app_1.WebSession.isLoggedOut(session);
                     const user = yield app_1.User.create(username, password, profilePhoto, code);
-                    yield app_1.Record.create(user.user.username);
+                    yield app_1.Meter.create(user.user.username);
                     return user.user;
                 });
             }
@@ -116,6 +119,10 @@ let Routes = (() => {
                 return __awaiter(this, void 0, void 0, function* () {
                     const user = app_1.WebSession.getUser(session);
                     app_1.WebSession.end(session);
+                    yield app_1.Workout.deleteByAthlete(user);
+                    const username = (yield app_1.User.getUserById(user)).username;
+                    yield app_1.PR.deleteByRower(username);
+                    yield app_1.Meter.delete(username);
                     return yield app_1.User.delete(user);
                 });
             }
@@ -147,10 +154,23 @@ let Routes = (() => {
                     return responses_1.default.workouts(workouts);
                 });
             }
-            createWorkout(session, type, meter, workoutDate) {
+            createWorkout(session, type, meter, workoutDate, description) {
                 return __awaiter(this, void 0, void 0, function* () {
                     const user = app_1.WebSession.getUser(session);
-                    const created = yield app_1.Workout.create(user, type, Number(meter), workoutDate);
+                    const created = yield app_1.Workout.create(user, type, Number(meter), workoutDate, description);
+                    // Updating meters
+                    const username = (yield app_1.User.getUserById(user)).username;
+                    const workouts = yield app_1.Workout.getByAthlete(user);
+                    let totalMeter = 0;
+                    for (const workout of workouts) {
+                        if (workout.type === "erg") {
+                            totalMeter += workout.meter * 1;
+                        }
+                        else {
+                            totalMeter += workout.meter * 2;
+                        }
+                    }
+                    yield app_1.Meter.update(username, { meter: totalMeter });
                     return { msg: created.msg, post: yield responses_1.default.workout(created.workout) };
                 });
             }
@@ -158,13 +178,40 @@ let Routes = (() => {
                 return __awaiter(this, void 0, void 0, function* () {
                     const user = app_1.WebSession.getUser(session);
                     yield app_1.Workout.isAthlete(user, _id);
-                    return yield app_1.Workout.update(_id, update);
+                    yield app_1.Workout.update(_id, update);
+                    // Updating meters
+                    const username = (yield app_1.User.getUserById(user)).username;
+                    const workouts = yield app_1.Workout.getByAthlete(user);
+                    let totalMeter = 0;
+                    for (const workout of workouts) {
+                        if (workout.type === "erg") {
+                            totalMeter += workout.meter * 1;
+                        }
+                        else {
+                            totalMeter += workout.meter * 2;
+                        }
+                    }
+                    yield app_1.Meter.update(username, { meter: totalMeter });
+                    return;
                 });
             }
             deleteWorkout(session, _id) {
                 return __awaiter(this, void 0, void 0, function* () {
                     const user = app_1.WebSession.getUser(session);
                     yield app_1.Workout.isAthlete(user, _id);
+                    // Updating meters
+                    const username = (yield app_1.User.getUserById(user)).username;
+                    const workouts = yield app_1.Workout.getByAthlete(user);
+                    let totalMeter = 0;
+                    for (const workout of workouts) {
+                        if (workout.type === "erg") {
+                            totalMeter += workout.meter * 1;
+                        }
+                        else {
+                            totalMeter += workout.meter * 2;
+                        }
+                    }
+                    yield app_1.Meter.update(username, { meter: totalMeter });
                     return app_1.Workout.delete(_id);
                 });
             }
@@ -184,7 +231,47 @@ let Routes = (() => {
             }
             getAllMeter() {
                 return __awaiter(this, void 0, void 0, function* () {
-                    return app_1.Record.getRecords({});
+                    return app_1.Meter.getMeters({});
+                });
+            }
+            postPR(session, type, pr) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    const user = app_1.WebSession.getUser(session);
+                    const username = (yield app_1.User.getUserById(user)).username;
+                    const created = yield app_1.PR.create(username, type, pr);
+                    return created;
+                });
+            }
+            getPRs(type) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    const prs = yield app_1.PR.getPRs({ type });
+                    return prs;
+                });
+            }
+            getPRsByUsername(session) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    console.log("here");
+                    const user = app_1.WebSession.getUser(session);
+                    const username = (yield app_1.User.getUserById(user)).username;
+                    console.log(username);
+                    const prs = yield app_1.PR.getByRower(username);
+                    return prs;
+                });
+            }
+            updateMeters(user) {
+                return __awaiter(this, void 0, void 0, function* () {
+                    const username = (yield app_1.User.getUserById(user)).username;
+                    const workouts = yield app_1.Workout.getByAthlete(user);
+                    let totalMeter = 0;
+                    for (const workout of workouts) {
+                        if (workout.type === "erg") {
+                            totalMeter += workout.meter * 1;
+                        }
+                        else {
+                            totalMeter += workout.meter * 2;
+                        }
+                    }
+                    yield app_1.Meter.update(username, { meter: totalMeter });
                 });
             }
             constructor() {
@@ -207,7 +294,10 @@ let Routes = (() => {
             _updateWorkout_decorators = [router_1.Router.patch("/workouts/:_id")];
             _deleteWorkout_decorators = [router_1.Router.delete("/workouts/:_id")];
             _getMeter_decorators = [router_1.Router.get("/meter")];
-            _getAllMeter_decorators = [router_1.Router.get("/record")];
+            _getAllMeter_decorators = [router_1.Router.get("/ranking")];
+            _postPR_decorators = [router_1.Router.post("/prs/:type")];
+            _getPRs_decorators = [router_1.Router.get("/prs/:type")];
+            _getPRsByUsername_decorators = [router_1.Router.get("/prs")];
             __esDecorate(_a, null, _getSessionUser_decorators, { kind: "method", name: "getSessionUser", static: false, private: false, access: { has: obj => "getSessionUser" in obj, get: obj => obj.getSessionUser }, metadata: _metadata }, null, _instanceExtraInitializers);
             __esDecorate(_a, null, _getUsers_decorators, { kind: "method", name: "getUsers", static: false, private: false, access: { has: obj => "getUsers" in obj, get: obj => obj.getUsers }, metadata: _metadata }, null, _instanceExtraInitializers);
             __esDecorate(_a, null, _getUser_decorators, { kind: "method", name: "getUser", static: false, private: false, access: { has: obj => "getUser" in obj, get: obj => obj.getUser }, metadata: _metadata }, null, _instanceExtraInitializers);
@@ -223,6 +313,9 @@ let Routes = (() => {
             __esDecorate(_a, null, _deleteWorkout_decorators, { kind: "method", name: "deleteWorkout", static: false, private: false, access: { has: obj => "deleteWorkout" in obj, get: obj => obj.deleteWorkout }, metadata: _metadata }, null, _instanceExtraInitializers);
             __esDecorate(_a, null, _getMeter_decorators, { kind: "method", name: "getMeter", static: false, private: false, access: { has: obj => "getMeter" in obj, get: obj => obj.getMeter }, metadata: _metadata }, null, _instanceExtraInitializers);
             __esDecorate(_a, null, _getAllMeter_decorators, { kind: "method", name: "getAllMeter", static: false, private: false, access: { has: obj => "getAllMeter" in obj, get: obj => obj.getAllMeter }, metadata: _metadata }, null, _instanceExtraInitializers);
+            __esDecorate(_a, null, _postPR_decorators, { kind: "method", name: "postPR", static: false, private: false, access: { has: obj => "postPR" in obj, get: obj => obj.postPR }, metadata: _metadata }, null, _instanceExtraInitializers);
+            __esDecorate(_a, null, _getPRs_decorators, { kind: "method", name: "getPRs", static: false, private: false, access: { has: obj => "getPRs" in obj, get: obj => obj.getPRs }, metadata: _metadata }, null, _instanceExtraInitializers);
+            __esDecorate(_a, null, _getPRsByUsername_decorators, { kind: "method", name: "getPRsByUsername", static: false, private: false, access: { has: obj => "getPRsByUsername" in obj, get: obj => obj.getPRsByUsername }, metadata: _metadata }, null, _instanceExtraInitializers);
             if (_metadata) Object.defineProperty(_a, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });
         })(),
         _a;

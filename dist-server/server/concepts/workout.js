@@ -19,9 +19,9 @@ class WorkoutConcept {
     constructor() {
         this.workouts = new doc_1.default("workouts");
     }
-    create(athlete, type, meter, workoutDate) {
+    create(athlete, type, meter, workoutDate, description) {
         return __awaiter(this, void 0, void 0, function* () {
-            const _id = yield this.workouts.createOne({ athlete, type, meter, workoutDate });
+            const _id = yield this.workouts.createOne({ athlete, type, meter, workoutDate, description });
             return { msg: "Workout successfully created!", workout: yield this.workouts.readOne({ _id }) };
         });
     }

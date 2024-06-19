@@ -5,12 +5,13 @@ import { fetchy } from "../../utils/fetchy";
 const type = ref("");
 const meter = ref("");
 const workoutDate = ref("");
+const description = ref("");
 const emit = defineEmits(["refreshPosts"]);
 
-const createWorkout = async (type: string, meter: string, workoutDate: string) => {
+const createWorkout = async (type: string, meter: string, workoutDate: string, description: string) => {
   try {
     await fetchy("/api/workouts", "POST", {
-      body: { type, meter, workoutDate },
+      body: { type, meter, workoutDate, description },
     });
   } catch (_) {
     return;
@@ -23,30 +24,38 @@ const emptyForm = () => {
   type.value = "";
   meter.value = "";
   workoutDate.value = "";
+  description.value = "";
 };
 </script>
 
 <template>
-  <form @submit.prevent="createWorkout(type, meter, workoutDate)">
+  <form @submit.prevent="createWorkout(type, meter, workoutDate, description)">
     <div class="form-group">
       <label for="type"> <i class="fas fa-dumbbell"></i> Workout Type: </label>
       <select id="type" v-model="type" required>
         <option value="" disabled>Select workout type</option>
-        <option value="cardio">Cardio</option>
-        <option value="strength">Strength</option>
-        <option value="flexibility">Flexibility</option>
-        <option value="balance">Balance</option>
+        <option value="single">1x</option>
+        <option value="double/pair">2x/2-</option>
+        <option value="eight">4x/4-/4+/8+</option>
+        <option value="erg">Erg</option>
+        <option value="running">Run</option>
+        <option value="cycling">Bike</option>
       </select>
     </div>
 
     <div class="form-group">
       <label for="meter"> <i class="fas fa-clock-o"></i> Meter: </label>
-      <textarea id="meter" v-model="meter" placeholder="Enter meter" required></textarea>
+      <input id="meter" v-model="meter" placeholder="Enter meter" required />
     </div>
 
     <div class="form-group">
       <label for="date"> <i class="fas fa-calendar-alt"></i> Workout Date: </label>
       <input id="date" type="date" v-model="workoutDate" required />
+    </div>
+
+    <div class="form-group">
+      <label for="description"> <i class="fas fa-pen"></i> Description: </label>
+      <textarea id="description" v-model="description" placeholder="Enter description"></textarea>
     </div>
 
     <button type="submit" class="submit-button"><i class="fas fa-plus-circle"></i> Add</button>
@@ -115,6 +124,10 @@ h2 {
 .form-group textarea {
   resize: none;
   height: 100px;
+}
+
+#meter {
+  height: auto;
 }
 
 .submit-button {
