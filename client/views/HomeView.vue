@@ -11,14 +11,22 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
 <template>
   <main>
     <section class="welcome-section" v-if="isLoggedIn">
-      <h1>Welcome {{ currentUsername }}!</h1>
+      <h1>Welcome, {{ currentUsername }}!</h1>
     </section>
     <div class="container">
-      <div class="box" v-if="isLoggedIn">
-        <CreateWorkoutForm />
-      </div>
-      <div class="box" v-if="isLoggedIn">
-        <WorkoutListComponent />
+      <div class="column" v-if="isLoggedIn">
+        <div class="box">
+          <div class="icon-container">
+            <i class="fas fa-dumbbell icon"></i>
+          </div>
+          <CreateWorkoutForm />
+        </div>
+        <div class="box">
+          <div class="icon-container">
+            <i class="fas fa-list icon"></i>
+          </div>
+          <WorkoutListComponent />
+        </div>
       </div>
       <div class="box" v-else>
         <LoginView />
@@ -29,10 +37,11 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"); /* Importing the Roboto font */
+@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"); /* Importing Font Awesome */
 
 body {
   font-family: "Roboto", sans-serif; /* Applying the Roboto font */
-  background-color: #f0f2f5; /* Light background color */
+  background-color: #e0f7fa; /* Light athletic background color */
   margin: 0; /* Removes default margin */
   display: flex;
   justify-content: center;
@@ -54,31 +63,63 @@ main {
 
 h1 {
   text-align: center;
-  font-size: 2em;
-  color: #333;
+  font-size: 2.5em;
+  color: #00796b; /* Athletic theme color */
 }
 
 .container {
   display: flex;
-  flex-wrap: wrap;
-  gap: 2em;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 2em; /* Space between the boxes */
 }
 
 .box {
   background-color: white;
-  border-radius: 10px;
+  border-radius: 15px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  padding: 2em;
+  width: 100%;
+  max-width: 600px; /* Set a max-width for larger screens */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.box > * {
+  width: 100%;
+}
+
+.icon-container {
+  position: absolute;
+  top: -30px;
+  background-color: #00796b;
+  border-radius: 50%;
+  padding: 10px;
+  color: white;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 1.5em;
-  width: 100%; /* Set the width to 100% to make it responsive */
-  max-width: 400px; /* Set a max-width if you want to limit the width on larger screens */
+}
+
+.icon {
+  font-size: 2em;
 }
 
 @media (max-width: 768px) {
   .container {
-    flex-direction: column;
-    align-items: center;
+    padding: 1em; /* Adjust padding for small screens */
+  }
+
+  .box {
+    max-width: 100%;
   }
 }
 </style>

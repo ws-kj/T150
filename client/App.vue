@@ -58,6 +58,7 @@ body {
   background-attachment: fixed; /* Keeps the background fixed during scrolling */
   margin: 0; /* Removes default margin */
   font-family: "Roboto", sans-serif; /* Applying the Roboto font */
+  overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
 nav {
@@ -70,6 +71,7 @@ nav {
   justify-content: space-between;
   align-items: center;
   z-index: 1000;
+  box-sizing: border-box; /* Ensure padding is included in width calculation */
 }
 
 .title {
@@ -112,6 +114,7 @@ img {
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
   z-index: 1;
   flex-direction: column;
+  overflow-x: hidden; /* Prevent dropdown from overflowing */
 }
 
 .dropdown-content a {
@@ -157,6 +160,7 @@ img {
   nav {
     flex-direction: column;
     align-items: flex-start;
+    padding: 1em; /* Adjust padding for small screens */
   }
 
   .dropdown-content {
