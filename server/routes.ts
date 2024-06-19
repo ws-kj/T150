@@ -96,15 +96,7 @@ class Routes {
     // Updating meters
     const username = (await User.getUserById(user)).username;
     const workouts = await Workout.getByAthlete(user);
-    let totalMeter = 0;
-    for (const workout of workouts) {
-      if (workout.type === "erg") {
-        totalMeter += workout.meter * 1;
-      } else {
-        totalMeter += workout.meter * 2;
-      }
-    }
-    await Meter.update(username, { meter: totalMeter });
+    await Meter.update(username, workouts);
     return { msg: created.msg, post: await Responses.workout(created.workout) };
   }
 
@@ -116,15 +108,7 @@ class Routes {
     // Updating meters
     const username = (await User.getUserById(user)).username;
     const workouts = await Workout.getByAthlete(user);
-    let totalMeter = 0;
-    for (const workout of workouts) {
-      if (workout.type === "erg") {
-        totalMeter += workout.meter * 1;
-      } else {
-        totalMeter += workout.meter * 2;
-      }
-    }
-    await Meter.update(username, { meter: totalMeter });
+    await Meter.update(username, workouts);
     return;
   }
 
@@ -135,29 +119,15 @@ class Routes {
     // Updating meters
     const username = (await User.getUserById(user)).username;
     const workouts = await Workout.getByAthlete(user);
-    let totalMeter = 0;
-    for (const workout of workouts) {
-      if (workout.type === "erg") {
-        totalMeter += workout.meter * 1;
-      } else {
-        totalMeter += workout.meter * 2;
-      }
-    }
-    await Meter.update(username, { meter: totalMeter });
-
+    await Meter.update(username, workouts);
     return Workout.delete(_id);
   }
 
   @Router.get("/meter")
-  async getMeter(session: WebSessionDoc, athlete?: string) {
-    let meter: number;
-    if (athlete) {
-      const id = (await User.getUserByUsername(athlete))._id;
-      meter = await Workout.getTotalMeter(id);
-    } else {
-      const id = WebSession.getUser(session);
-      meter = await Workout.getTotalMeter(id);
-    }
+  async getMeter(session: WebSessionDoc) {
+    const user = WebSession.getUser(session);
+    const username = (await User.getUserById(user)).username;
+    const meter = Meter.getMeterByRower(username);
     return meter;
   }
 
@@ -188,20 +158,6 @@ class Routes {
     console.log(username);
     const prs = await PR.getByRower(username);
     return prs;
-  }
-
-  async updateMeters(user: ObjectId) {
-    const username = (await User.getUserById(user)).username;
-    const workouts = await Workout.getByAthlete(user);
-    let totalMeter = 0;
-    for (const workout of workouts) {
-      if (workout.type === "erg") {
-        totalMeter += workout.meter * 1;
-      } else {
-        totalMeter += workout.meter * 2;
-      }
-    }
-    await Meter.update(username, { meter: totalMeter });
   }
 }
 

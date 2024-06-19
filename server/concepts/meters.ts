@@ -1,6 +1,7 @@
 import { Filter, ObjectId } from "mongodb";
 
 import DocCollection, { BaseDoc } from "../framework/doc";
+import { WorkoutDoc } from "./workout";
 import { NotAllowedError, NotFoundError } from "./errors";
 
 export interface MeterDoc extends BaseDoc {
@@ -31,8 +32,13 @@ export default class MeterConcept {
     return meters;
   }
 
-  async update(rower: string, update: Partial<MeterDoc>) {
-    this.sanitizeUpdate(update);
+  async getMeterByRower(rower: string) {
+    return (await this.meters.readOne({ rower }))?.meter;
+  }
+
+  async update(rower: string, workouts: WorkoutDoc[]) {
+    const meter = this.compute(workouts);
+    const update = { meter };
     await this.meters.updateOne({ rower }, update);
     return { msg: "Workout successfully updated!" };
   }
@@ -42,29 +48,27 @@ export default class MeterConcept {
     return { msg: "Workout deleted successfully!" };
   }
 
-  //   async deleteByAthlete(athlete: ObjectId) {
-  //     await this.workouts.deleteMany({ athlete: athlete });
-  //     return { msg: `All '${athlete}''s workouts deleted successfully!` };
-  //   }
-
-  //   async getTotalMeter(athlete: ObjectId) {
-  //     const workouts = await this.workouts.readMany({ athlete });
-  //     let total = 0;
-  //     for (const workout of workouts) {
-  //       total += workout.meter;
-  //     }
-  //     return total;
-  //   }
-
-  //   async isAthlete(user: ObjectId, _id: ObjectId) {
-  //     const workout = await this.workouts.readOne({ _id });
-  //     if (!workout) {
-  //       throw new NotFoundError(`Workout ${_id} does not exist!`);
-  //     }
-  //     if (workout.athlete.toString() !== user.toString()) {
-  //       throw new WorkoutAthleteNotMatchError(user, _id);
-  //     }
-  //   }
+  private compute(workouts: WorkoutDoc[]) {
+    let totalMeter = 0;
+    for (const workout of workouts) {
+      if (workout.type === "single") {
+        totalMeter += workout.meter * 1.5;
+      } else if (workout.type === "double/pair") {
+        totalMeter += workout.meter * 1.25;
+      } else if (workout.type === "eight") {
+        totalMeter += workout.meter * 1;
+      } else if (workout.type === "erg") {
+        totalMeter += workout.meter * 1;
+      } else if (workout.type === "bikeerg") {
+        totalMeter += workout.meter * 0.45;
+      } else if (workout.type === "lift") {
+        totalMeter += workout.meter * 5000;
+      } else if (workout.type === "running") {
+        totalMeter += workout.meter * 3;
+      }
+    }
+    return totalMeter;
+  }
 
   private sanitizeUpdate(update: Partial<MeterDoc>) {
     // Make sure the update cannot change the athlete.

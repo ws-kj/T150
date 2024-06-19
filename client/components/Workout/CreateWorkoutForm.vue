@@ -40,6 +40,8 @@ const emptyForm = () => {
         <option value="erg">Erg</option>
         <option value="running">Run</option>
         <option value="cycling">Bike</option>
+        <option value="bikeerg">C2 Bike</option>
+        <option value="lift">Lift session</option>
       </select>
     </div>
 
