@@ -9,7 +9,7 @@ export interface MeterDoc extends BaseDoc {
 }
 
 export default class MeterConcept {
-  public readonly meters = new DocCollection<MeterDoc>("records");
+  public readonly meters = new DocCollection<MeterDoc>("meters");
 
   async create(rower: string) {
     const _id = await this.meters.createOne({ rower, meter: 0 });
