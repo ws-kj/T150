@@ -2,7 +2,6 @@
 import router from "@/router";
 import { useUserStore } from "@/stores/user";
 import { ref } from "vue";
-import UploadMedia from "../Media/UploadMedia.vue";
 
 const username = ref("");
 const password = ref("");
@@ -40,9 +39,6 @@ async function assignURL(url: string) {
       <div class="pure-control-group">
         <label for="aligned-password">Password</label>
         <input type="password" v-model.trim="password" id="aligned-password" placeholder="Password" required />
-      </div>
-      <div class="pure-control-group">
-        <UploadMedia @update:imageURL="assignURL"></UploadMedia>
       </div>
       <div class="pure-controls">
         <button id="Register" type="submit" class="pure-button pure-button-primary">Register</button>
