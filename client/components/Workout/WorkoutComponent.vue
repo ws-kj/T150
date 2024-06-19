@@ -37,7 +37,7 @@ const deleteWorkout = async () => {
           <button class="delete-button" @click="deleteWorkout"><i class="fas fa-trash-alt"></i> Delete</button>
         </li>
       </menu>
-      <p class="timestamp"><i class="far fa-clock"></i> Created on: {{ formatDate(props.workout.workoutDate) }}</p>
+      <p class="timestamp"><i class="far fa-clock"></i> Done on: {{ formatDate(props.workout.workoutDate) }}</p>
     </div>
   </div>
 </template>
