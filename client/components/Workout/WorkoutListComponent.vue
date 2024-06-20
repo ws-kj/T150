@@ -50,7 +50,7 @@ onBeforeMount(async () => {
 <template>
   <section v-if="isLoggedIn && props.createWorkoutEnabled" class="create-post">
     <h2>Create a post:</h2>
-    <CreateWorkoutForm @refreshWorkouts="refreshWorkouts" />
+    <CreateWorkoutForm @refreshWorkouts="getWorkouts" />
   </section>
   <div class="row">
     <h2 v-if="!searchAthlete">Workouts:</h2>
