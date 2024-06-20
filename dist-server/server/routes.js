@@ -184,10 +184,11 @@ let Routes = (() => {
                     const user = app_1.WebSession.getUser(session);
                     yield app_1.Workout.isAthlete(user, _id);
                     // Updating meters
+                    const deleted = yield app_1.Workout.delete(_id);
                     const username = (yield app_1.User.getUserById(user)).username;
                     const workouts = yield app_1.Workout.getByAthlete(user);
                     yield app_1.Meter.update(username, workouts);
-                    return app_1.Workout.delete(_id);
+                    return { msg: deleted.msg };
                 });
             }
             getMeter(session) {

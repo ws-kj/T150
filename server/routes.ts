@@ -119,10 +119,11 @@ class Routes {
     const user = WebSession.getUser(session);
     await Workout.isAthlete(user, _id);
     // Updating meters
+    const deleted = await Workout.delete(_id);
     const username = (await User.getUserById(user)).username;
     const workouts = await Workout.getByAthlete(user);
     await Meter.update(username, workouts);
-    return Workout.delete(_id);
+    return { msg: deleted.msg };
   }
 
   @Router.get("/meter")
