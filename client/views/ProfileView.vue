@@ -5,17 +5,15 @@ import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
 import router from "@/router";
 import PRViewComponent from "../components/Record/PRViewComponent.vue";
-// import TwoKForm from "../components/Record/TwoKForm.vue";
-// import SixKForm from "../components/Record/SixKForm.vue";
-// import BenchPressForm from "../components/Record/BenchPressForm.vue";
-// import SquatForm from "../components/Record/SquatForm.vue";
 
-const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
+const { currentUsername, isLoggedIn, currentSide } = storeToRefs(useUserStore());
 const { deleteUser } = useUserStore();
 
 const props = defineProps(["username"]);
 const totalMeter = ref(0);
 const PRs = ref<Array<Record<string, string>>>([]);
+const showConfirmModal = ref(false);
+const side = ref(currentSide.value);
 
 async function fetchData() {
   try {
@@ -29,6 +27,7 @@ async function fetchData() {
 async function delete_() {
   await deleteUser();
   void router.push({ name: "Home" });
+  showConfirmModal.value = false;
 }
 
 onBeforeMount(async () => {
@@ -41,11 +40,9 @@ onBeforeMount(async () => {
     <div class="profile-wrapper">
       <div class="profile-info">
         <p class="username">{{ props.username }}</p>
+        <p>{{ side }}</p>
         <p>Total meters: {{ totalMeter }}</p>
-        <RouterLink v-if="isLoggedIn && props.username == currentUsername" class="settings" :to="{ name: 'Settings' }">
-          <!-- <button class="button-secondary pure-button">Settings</button> -->
-          <button class="button-error pure-button" @click="delete_">Delete User</button>
-        </RouterLink>
+        <button class="button-error pure-button" @click="showConfirmModal = true">Delete User</button>
       </div>
       <div class="pr-list">
         <h3>Personal Records</h3>
@@ -54,6 +51,16 @@ onBeforeMount(async () => {
         </article>
       </div>
     </div>
+
+    <div v-if="showConfirmModal" class="modal-overlay" @click.self="showConfirmModal = false">
+      <div class="modal-content">
+        <h2>Confirm Deletion</h2>
+        <p>Are you sure you want to delete this user?</p>
+        <button @click="delete_" class="confirm-button"><i class="fas fa-check"></i> Yes</button>
+        <button @click="showConfirmModal = false" class="cancel-button"><i class="fas fa-times"></i> No</button>
+      </div>
+    </div>
+
     <!-- <div class="forms-wrapper">
       <TwoKForm />
       <SixKForm />
@@ -151,5 +158,80 @@ button {
   gap: 1em;
   width: 100%;
   max-width: 600px;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 2em;
+  border-radius: 10px;
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  position: relative;
+}
+
+.confirm-button {
+  padding: 0.5em 1em;
+  background-color: #28a745;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  display: inline-flex;
+  align-items: center;
+  margin-right: 1em;
+}
+
+.confirm-button:hover {
+  background-color: #218838;
+}
+
+.confirm-button i {
+  margin-right: 5px;
+}
+
+.cancel-button {
+  padding: 0.5em 1em;
+  background-color: #dc3545;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  display: inline-flex;
+  align-items: center;
+}
+
+.cancel-button:hover {
+  background-color: #c82333;
+}
+
+.cancel-button i {
+  margin-right: 5px;
+}
+
+@media (max-width: 768px) {
+  .workout {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .actions {
+    align-items: flex-start;
+  }
 }
 </style>

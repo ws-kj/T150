@@ -9,7 +9,7 @@ import router from "@/router";
 const currentRoute = useRoute();
 const currentRouteName = computed(() => currentRoute.name);
 const userStore = useUserStore();
-const { currentUsername, isLoggedIn, currentUserProfilePhoto } = storeToRefs(userStore);
+const { currentUsername, isLoggedIn, currentSide } = storeToRefs(userStore);
 const { toast } = storeToRefs(useToastStore());
 const { logoutUser } = useUserStore();
 

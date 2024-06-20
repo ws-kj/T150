@@ -90,7 +90,7 @@ class MeterConcept {
                 totalMeter += workout.meter * 3;
             }
             else if (workout.type === "running") {
-                totalMeter += workout.meter * 3;
+                totalMeter += workout.meter * 1.5;
             }
         }
         return totalMeter;

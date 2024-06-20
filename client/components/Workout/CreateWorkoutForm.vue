@@ -8,6 +8,7 @@ const meter = ref(0);
 const workoutDate = ref("");
 const description = ref("");
 const error = ref("");
+const showModal = ref(false);
 const emit = defineEmits(["refreshWorkouts"]);
 const isLiftSession = computed(() => type.value === "lift");
 
@@ -86,6 +87,32 @@ const emptyForm = () => {
     <p v-if="error" class="error-message">{{ error }}</p>
 
     <button type="submit" class="submit-button"><i class="fas fa-plus-circle"></i> Add</button>
+    <button type="button" class="info-button" @click="showModal = true"><i class="fas fa-info-circle"></i> How to Log Workouts</button>
+
+    <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
+      <div class="modal-content">
+        <h2>How to Log Workouts</h2>
+        <p>Follow these steps to log your workouts:</p>
+        <ol>
+          <li>Select the workout type from the dropdown menu.</li>
+          <li>Enter the meter of your workout, everything must be enter in meter.</li>
+          <li>If you are entering a lift session, just enter 1. 1 lift session is at least half an hour.</li>
+          <li>Select the workout date.</li>
+          <li>Provide a description (optional).</li>
+          <li>Click "Add" to log your workout.</li>
+        </ol>
+        <p>Conversion metrics</p>
+        <ol>
+          <li>1m running = 1.5m erging</li>
+          <li>1m single = 1.5m erging</li>
+          <li>1m double/pair = 1.25m erging</li>
+          <li>1m bike erg = 0.45m erging</li>
+          <li>1m cycling = 0.34m erging</li>
+          <li>1 lift session = 5000m erging</li>
+        </ol>
+        <button @click="showModal = false" class="close-button">Close</button>
+      </div>
+    </div>
   </form>
 </template>
 
@@ -164,7 +191,8 @@ h2 {
   font-size: 0.9em;
 }
 
-.submit-button {
+.submit-button,
+.info-button {
   padding: 0.75em 1.5em;
   background-color: #28a745;
   border: none;
@@ -176,13 +204,56 @@ h2 {
   display: flex;
   align-items: center;
   gap: 0.5em;
+  margin-top: 1em;
 }
 
-.submit-button:hover {
+.submit-button:hover,
+.info-button:hover {
   background-color: #218838;
 }
 
-.submit-button i {
+.submit-button i,
+.info-button i {
   font-size: 1.2em;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 2em;
+  border-radius: 10px;
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  position: relative;
+}
+
+.close-button {
+  padding: 0.5em 1em;
+  background-color: #dc3545;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.close-button:hover {
+  background-color: #c82333;
 }
 </style>

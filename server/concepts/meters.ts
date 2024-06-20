@@ -68,7 +68,7 @@ export default class MeterConcept {
       } else if (workout.type === "swimming") {
         totalMeter += workout.meter * 3;
       } else if (workout.type === "running") {
-        totalMeter += workout.meter * 3;
+        totalMeter += workout.meter * 1.5;
       }
     }
     return totalMeter;

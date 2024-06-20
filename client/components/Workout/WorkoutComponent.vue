@@ -3,10 +3,12 @@ import { useUserStore } from "@/stores/user";
 import { formatDate } from "@/utils/formatDate";
 import { storeToRefs } from "pinia";
 import { fetchy } from "../../utils/fetchy";
+import { ref } from "vue";
 
 const props = defineProps(["workout"]);
 const emit = defineEmits(["editWorkout", "refreshWorkouts"]);
 const { currentUsername } = storeToRefs(useUserStore());
+const showConfirmModal = ref(false);
 
 const deleteWorkout = async () => {
   try {
@@ -15,6 +17,7 @@ const deleteWorkout = async () => {
     return;
   }
   emit("refreshWorkouts");
+  showConfirmModal.value = false;
 };
 </script>
 
@@ -30,14 +33,20 @@ const deleteWorkout = async () => {
     </div>
     <div class="actions">
       <menu v-if="props.workout.athlete == currentUsername">
-        <!-- <li>
-          <button class="edit-button" @click="emit('editWorkout', props.workout._id)"><i class="fas fa-edit"></i> Edit</button>
-        </li> -->
         <li>
-          <button class="delete-button" @click="deleteWorkout"><i class="fas fa-trash-alt"></i> Delete</button>
+          <button class="delete-button" @click="showConfirmModal = true"><i class="fas fa-trash-alt"></i> Delete</button>
         </li>
       </menu>
       <p class="timestamp"><i class="far fa-clock"></i> Done on: {{ formatDate(props.workout.workoutDate) }}</p>
+    </div>
+  </div>
+
+  <div v-if="showConfirmModal" class="modal-overlay" @click.self="showConfirmModal = false">
+    <div class="modal-content">
+      <h2>Confirm Deletion</h2>
+      <p>Are you sure you want to delete this workout?</p>
+      <button @click="deleteWorkout" class="confirm-button"><i class="fas fa-check"></i> Yes</button>
+      <button @click="showConfirmModal = false" class="cancel-button"><i class="fas fa-times"></i> No</button>
     </div>
   </div>
 </template>
@@ -108,7 +117,6 @@ const deleteWorkout = async () => {
   color: #777;
 }
 
-.edit-button,
 .delete-button {
   padding: 0.5em 1em;
   border: none;
@@ -117,16 +125,80 @@ const deleteWorkout = async () => {
   transition: background-color 0.3s;
   display: flex;
   align-items: center;
-}
-
-.edit-button:hover,
-.delete-button:hover {
-  background-color: #007bff;
+  background-color: #dc3545;
   color: white;
 }
 
-.edit-button i,
+.delete-button:hover {
+  background-color: #c82333;
+}
+
 .delete-button i {
+  margin-right: 5px;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 2em;
+  border-radius: 10px;
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  position: relative;
+}
+
+.confirm-button {
+  padding: 0.5em 1em;
+  background-color: #28a745;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  display: inline-flex;
+  align-items: center;
+  margin-right: 1em;
+}
+
+.confirm-button:hover {
+  background-color: #218838;
+}
+
+.confirm-button i {
+  margin-right: 5px;
+}
+
+.cancel-button {
+  padding: 0.5em 1em;
+  background-color: #dc3545;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  display: inline-flex;
+  align-items: center;
+}
+
+.cancel-button:hover {
+  background-color: #c82333;
+}
+
+.cancel-button i {
   margin-right: 5px;
 }
 
