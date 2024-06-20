@@ -25,6 +25,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const doc_1 = __importDefault(require("../framework/doc"));
 const errors_1 = require("./errors");
+const regCode = process.env.REG_CODE;
+if (!regCode) {
+    throw new Error("Please add REG_CODE");
+}
 class UserConcept {
     constructor() {
         this.users = new doc_1.default("users");
@@ -133,7 +137,7 @@ class UserConcept {
             if (!username) {
                 throw new errors_1.BadValuesError("The username cannot be empty");
             }
-            if (code !== "123") {
+            if (code !== regCode) {
                 throw new errors_1.NotAllowedError("Not correct passcode");
             }
             yield this.isUsernameUnique(username);

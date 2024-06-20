@@ -1,10 +1,10 @@
 import { Filter, ObjectId } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
 import { BadValuesError, NotAllowedError, NotFoundError } from "./errors";
-// const regCode = process.env.REG_CODE;
-// if (!regCode) {
-//   throw new Error("Please add REG_CODE");
-// }
+const regCode = process.env.REG_CODE;
+if (!regCode) {
+  throw new Error("Please add REG_CODE");
+}
 
 export interface UserDoc extends BaseDoc {
   username: string;
@@ -116,7 +116,7 @@ export default class UserConcept {
     if (!username) {
       throw new BadValuesError("The username cannot be empty");
     }
-    if (code !== "123") {
+    if (code !== regCode) {
       throw new NotAllowedError("Not correct passcode");
     }
     await this.isUsernameUnique(username);
