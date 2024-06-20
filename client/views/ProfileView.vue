@@ -5,10 +5,10 @@ import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
 import router from "@/router";
 import PRViewComponent from "../components/Record/PRViewComponent.vue";
-import TwoKForm from "../components/Record/TwoKForm.vue";
-import SixKForm from "../components/Record/SixKForm.vue";
-import BenchPressForm from "../components/Record/BenchPressForm.vue";
-import SquatForm from "../components/Record/SquatForm.vue";
+// import TwoKForm from "../components/Record/TwoKForm.vue";
+// import SixKForm from "../components/Record/SixKForm.vue";
+// import BenchPressForm from "../components/Record/BenchPressForm.vue";
+// import SquatForm from "../components/Record/SquatForm.vue";
 
 const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
 const { deleteUser } = useUserStore();
@@ -54,12 +54,12 @@ onBeforeMount(async () => {
         </article>
       </div>
     </div>
-    <div class="forms-wrapper">
+    <!-- <div class="forms-wrapper">
       <TwoKForm />
       <SixKForm />
       <BenchPressForm />
       <SquatForm />
-    </div>
+    </div> -->
   </div>
 </template>
 

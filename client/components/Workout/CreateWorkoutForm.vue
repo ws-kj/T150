@@ -1,35 +1,52 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { fetchy } from "../../utils/fetchy";
+import { defineEmits } from "vue";
 
 const type = ref("");
-const meter = ref("");
+const meter = ref(0);
 const workoutDate = ref("");
 const description = ref("");
-const emit = defineEmits(["refreshPosts"]);
+const error = ref("");
+const emit = defineEmits(["refreshWorkouts"]);
+const isLiftSession = computed(() => type.value === "lift");
 
-const createWorkout = async (type: string, meter: string, workoutDate: string, description: string) => {
+const validateInput = () => {
+  if (!Number.isInteger(meter.value) || meter.value <= 0) {
+    error.value = "Meter or sessions must be a positive integer.";
+    return false;
+  }
+  error.value = "";
+  return true;
+};
+
+const createWorkout = async () => {
+  if (!validateInput()) {
+    return;
+  }
+
   try {
     await fetchy("/api/workouts", "POST", {
-      body: { type, meter, workoutDate, description },
+      body: { type: type.value, meter: meter.value, workoutDate: workoutDate.value, description: description.value },
     });
+    emit("refreshWorkouts");
+    emptyForm();
   } catch (_) {
     return;
   }
-  emit("refreshPosts");
-  emptyForm();
 };
 
 const emptyForm = () => {
   type.value = "";
-  meter.value = "";
+  meter.value = 0;
   workoutDate.value = "";
   description.value = "";
+  error.value = "";
 };
 </script>
 
 <template>
-  <form @submit.prevent="createWorkout(type, meter, workoutDate, description)">
+  <form @submit.prevent="createWorkout">
     <div class="form-group">
       <label for="type"> <i class="fas fa-dumbbell"></i> Workout Type: </label>
       <select id="type" v-model="type" required>
@@ -41,13 +58,19 @@ const emptyForm = () => {
         <option value="running">Run</option>
         <option value="cycling">Bike</option>
         <option value="bikeerg">C2 Bike</option>
+        <option value="swimming">Swimming</option>
         <option value="lift">Lift session</option>
       </select>
     </div>
 
-    <div class="form-group">
+    <div v-if="!isLiftSession" class="form-group">
       <label for="meter"> <i class="fas fa-clock-o"></i> Meter: </label>
-      <input id="meter" v-model="meter" placeholder="Enter meter" required />
+      <input id="meter" type="number" v-model.number="meter" placeholder="Enter meter" required />
+    </div>
+
+    <div v-else class="form-group">
+      <label for="sessions"> <i class="fas fa-dumbbell"></i> Sessions: </label>
+      <input id="sessions" type="number" v-model.number="meter" placeholder="Enter number of sessions" required />
     </div>
 
     <div class="form-group">
@@ -59,6 +82,8 @@ const emptyForm = () => {
       <label for="description"> <i class="fas fa-pen"></i> Description: </label>
       <textarea id="description" v-model="description" placeholder="Enter description"></textarea>
     </div>
+
+    <p v-if="error" class="error-message">{{ error }}</p>
 
     <button type="submit" class="submit-button"><i class="fas fa-plus-circle"></i> Add</button>
   </form>
@@ -128,8 +153,15 @@ h2 {
   height: 100px;
 }
 
-#meter {
+#error {
   height: auto;
+}
+
+.error-message {
+  color: red;
+  margin-top: -10px;
+  margin-bottom: 10px;
+  font-size: 0.9em;
 }
 
 .submit-button {

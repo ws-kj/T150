@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import EditPostForm from "./EditPostForm.vue";
+// import EditWorkoutForm from "./EditWorkoutForm.vue";
 import WorkoutComponent from "./WorkoutComponent.vue";
+import CreateWorkoutForm from "./CreateWorkoutForm.vue";
 import { useUserStore } from "../../stores/user";
-// import { formatDate } from "@/utils/formatDate";
 import { fetchy } from "../../utils/fetchy";
 import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
@@ -33,6 +33,10 @@ function updateEditing(id: string) {
   editing.value = id;
 }
 
+async function refreshWorkouts() {
+  await getWorkouts(searchAthlete.value);
+}
+
 onBeforeMount(async () => {
   if (props.startingFilter) {
     await getWorkouts(props.startingFilter);
@@ -46,17 +50,17 @@ onBeforeMount(async () => {
 <template>
   <section v-if="isLoggedIn && props.createWorkoutEnabled" class="create-post">
     <h2>Create a post:</h2>
-    <CreatePostForm @refreshPosts="getWorkouts" />
+    <CreateWorkoutForm @refreshWorkouts="refreshWorkouts" />
   </section>
   <div class="row">
     <h2 v-if="!searchAthlete">Workouts:</h2>
-    <h2 v-else>Posts by {{ searchAthlete }}:</h2>
-    <SearchAthleteForm @getWorkoutByAuthor="getWorkouts" />
+    <h2 v-else>Workouts by {{ searchAthlete }}:</h2>
+    <SearchAthleteForm @getWorkoutsByAthlete="getWorkouts" />
   </div>
   <section class="posts" v-if="loaded && workouts.length !== 0">
     <article v-for="workout in workouts" :key="workout._id">
-      <WorkoutComponent v-if="editing !== workout._id" :workout="workout" @refreshPosts="getWorkouts" @editPost="updateEditing" />
-      <EditPostForm v-else :workout="workout" @refreshWorkouts="getWorkouts" @editWorkout="updateEditing" />
+      <WorkoutComponent v-if="editing !== workout._id" :workout="workout" @refreshWorkouts="getWorkouts" @editWorkout="updateEditing" />
+      <!-- <EditWorkoutForm v-else :workout="workout" @refreshWorkouts="getWorkouts" @editWorkout="updateEditing" /> -->
     </article>
   </section>
   <p v-else-if="loaded">No posts found</p>

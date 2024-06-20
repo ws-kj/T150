@@ -8,7 +8,7 @@ const emit = defineEmits(["getWorkoutsByAthlete"]);
 <template>
   <form @submit.prevent="emit('getWorkoutsByAthlete', athlete)" class="pure-form">
     <fieldset>
-      <legend>Search by Athlete</legend>
+      <legend>Search by rower</legend>
       <input id="athlete" type="text" v-model="athlete" placeholder="Username" />
       <button type="submit" class="pure-button pure-button-primary">Search</button>
     </fieldset>

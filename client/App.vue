@@ -159,9 +159,21 @@ img {
   right: 20px;
   padding: 1em;
   background: white;
+  color: black; /* Ensures text is readable against the white background */
   border-radius: 0.5em;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
   z-index: 1000;
+  max-width: 300px; /* Ensures the toast doesn't get too wide */
+  word-wrap: break-word; /* Breaks long words to fit within the toast box */
+  font-size: 1em; /* Ensures the font size is readable */
+}
+
+.toast.success {
+  border-left: 5px solid green; /* Adds a visual indicator for success */
+}
+
+.toast.error {
+  border-left: 5px solid red; /* Adds a visual indicator for error */
 }
 
 @media (max-width: 768px) {

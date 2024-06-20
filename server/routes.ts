@@ -38,9 +38,10 @@ class Routes {
   }
 
   @Router.post("/users")
-  async createUser(session: WebSessionDoc, username: string, password: string, profilePhoto: string, code: string) {
+  async createUser(session: WebSessionDoc, username: string, password: string, profilePhoto: string, code: string, side: string) {
+    console.log("here");
     WebSession.isLoggedOut(session);
-    const user = await User.create(username, password, profilePhoto, code);
+    const user = await User.create(username, password, profilePhoto, code, side);
     await Meter.create(user.user.username);
     return user.user;
   }
@@ -54,11 +55,11 @@ class Routes {
   @Router.delete("/users")
   async deleteUser(session: WebSessionDoc) {
     const user = WebSession.getUser(session);
-    WebSession.end(session);
     await Workout.deleteByAthlete(user);
     const username = (await User.getUserById(user)).username;
     await PR.deleteByRower(username);
     await Meter.delete(username);
+    WebSession.end(session);
     return await User.delete(user);
   }
 
@@ -79,6 +80,7 @@ class Routes {
   // Workouts
   @Router.get("/workouts")
   async getWorkouts(athlete?: string) {
+    console.log(athlete);
     let workouts;
     if (athlete) {
       const id = (await User.getUserByUsername(athlete))._id;

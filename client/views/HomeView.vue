@@ -11,7 +11,10 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
 <template>
   <main>
     <section class="welcome-section" v-if="isLoggedIn">
-      <h1>Welcome, {{ currentUsername }}!</h1>
+      <h1>
+        Welcome, <span class="username">{{ currentUsername }}</span
+        >!
+      </h1>
     </section>
     <div class="container">
       <div class="column" v-if="isLoggedIn">
@@ -64,7 +67,13 @@ main {
 h1 {
   text-align: center;
   font-size: 2.5em;
-  color: #00796b; /* Athletic theme color */
+  color: #0044cc; /* Deep blue for the main text */
+}
+
+.username {
+  color: #ff4500; /* Bright red for the username */
+  font-weight: bold;
+  font-family: "Roboto", sans-serif; /* Ensuring the username uses Roboto font */
 }
 
 .container {
@@ -102,7 +111,7 @@ h1 {
 .icon-container {
   position: absolute;
   top: -30px;
-  background-color: #00796b;
+  background-color: #0044cc; /* Deep blue for the icon container */
   border-radius: 50%;
   padding: 10px;
   color: white;

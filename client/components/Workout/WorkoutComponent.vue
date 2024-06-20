@@ -25,14 +25,14 @@ const deleteWorkout = async () => {
         <p class="athlete">{{ props.workout.athlete }}</p>
         <p class="workout-type"><i class="fas fa-dumbbell"></i> {{ props.workout.type }}</p>
       </div>
-      <p class="meter"><i class="fas fa-running"></i> {{ props.workout.meter }} meters</p>
+      <p class="meter"><i class="fas fa-running"></i> {{ props.workout.meter }}</p>
       <p class="description"><i class="fas fa-pen"></i> {{ props.workout.description }}</p>
     </div>
     <div class="actions">
       <menu v-if="props.workout.athlete == currentUsername">
-        <li>
+        <!-- <li>
           <button class="edit-button" @click="emit('editWorkout', props.workout._id)"><i class="fas fa-edit"></i> Edit</button>
-        </li>
+        </li> -->
         <li>
           <button class="delete-button" @click="deleteWorkout"><i class="fas fa-trash-alt"></i> Delete</button>
         </li>

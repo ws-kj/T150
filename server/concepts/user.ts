@@ -1,14 +1,15 @@
 import { Filter, ObjectId } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
 import { BadValuesError, NotAllowedError, NotFoundError } from "./errors";
-const regCode = process.env.REG_CODE;
-if (!regCode) {
-  throw new Error("Please add REG_CODE");
-}
+// const regCode = process.env.REG_CODE;
+// if (!regCode) {
+//   throw new Error("Please add REG_CODE");
+// }
 
 export interface UserDoc extends BaseDoc {
   username: string;
   password: string;
+  side: string;
   profilePhoto: string; // ObjectId maybe?
 }
 
@@ -20,9 +21,9 @@ export interface SanitizedUserDoc extends BaseDoc {
 export default class UserConcept {
   public readonly users = new DocCollection<UserDoc>("users");
 
-  async create(username: string, password: string, profilePhoto: string, code: string) {
+  async create(username: string, password: string, profilePhoto: string, code: string, side: string) {
     await this.canCreate(username, code);
-    const _id = await this.users.createOne({ username: username, password: password, profilePhoto: profilePhoto });
+    const _id = await this.users.createOne({ username: username, password: password, profilePhoto: profilePhoto, side });
     return { msg: "User created successfully!", user: await this.getUserById(_id) };
   }
 
@@ -115,7 +116,7 @@ export default class UserConcept {
     if (!username) {
       throw new BadValuesError("The username cannot be empty");
     }
-    if (code !== regCode) {
+    if (code !== "123") {
       throw new NotAllowedError("Not correct passcode");
     }
     await this.isUsernameUnique(username);

@@ -17,7 +17,7 @@ const doc_1 = __importDefault(require("../framework/doc"));
 const errors_1 = require("./errors");
 class MeterConcept {
     constructor() {
-        this.meters = new doc_1.default("records");
+        this.meters = new doc_1.default("meters");
     }
     create(rower) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -42,9 +42,16 @@ class MeterConcept {
             return meters;
         });
     }
-    update(rower, update) {
+    getMeterByRower(rower) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            this.sanitizeUpdate(update);
+            return (_a = (yield this.meters.readOne({ rower }))) === null || _a === void 0 ? void 0 : _a.meter;
+        });
+    }
+    update(rower, workouts) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const meter = this.compute(workouts);
+            const update = { meter };
             yield this.meters.updateOne({ rower }, update);
             return { msg: "Workout successfully updated!" };
         });
@@ -55,27 +62,39 @@ class MeterConcept {
             return { msg: "Workout deleted successfully!" };
         });
     }
-    //   async deleteByAthlete(athlete: ObjectId) {
-    //     await this.workouts.deleteMany({ athlete: athlete });
-    //     return { msg: `All '${athlete}''s workouts deleted successfully!` };
-    //   }
-    //   async getTotalMeter(athlete: ObjectId) {
-    //     const workouts = await this.workouts.readMany({ athlete });
-    //     let total = 0;
-    //     for (const workout of workouts) {
-    //       total += workout.meter;
-    //     }
-    //     return total;
-    //   }
-    //   async isAthlete(user: ObjectId, _id: ObjectId) {
-    //     const workout = await this.workouts.readOne({ _id });
-    //     if (!workout) {
-    //       throw new NotFoundError(`Workout ${_id} does not exist!`);
-    //     }
-    //     if (workout.athlete.toString() !== user.toString()) {
-    //       throw new WorkoutAthleteNotMatchError(user, _id);
-    //     }
-    //   }
+    compute(workouts) {
+        let totalMeter = 0;
+        for (const workout of workouts) {
+            if (workout.type === "single") {
+                totalMeter += workout.meter * 1.5;
+            }
+            else if (workout.type === "double/pair") {
+                totalMeter += workout.meter * 1.25;
+            }
+            else if (workout.type === "eight") {
+                totalMeter += workout.meter * 1;
+            }
+            else if (workout.type === "erg") {
+                totalMeter += workout.meter * 1;
+            }
+            else if (workout.type === "bikeerg") {
+                totalMeter += workout.meter * 0.45;
+            }
+            else if (workout.type === "cycling") {
+                totalMeter += workout.meter * 0.34;
+            }
+            else if (workout.type === "lift") {
+                totalMeter += workout.meter * 5000;
+            }
+            else if (workout.type === "swimming") {
+                totalMeter += workout.meter * 3;
+            }
+            else if (workout.type === "running") {
+                totalMeter += workout.meter * 3;
+            }
+        }
+        return totalMeter;
+    }
     sanitizeUpdate(update) {
         // Make sure the update cannot change the athlete.
         const allowedUpdates = ["meter"];

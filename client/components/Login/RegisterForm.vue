@@ -2,18 +2,20 @@
 import router from "@/router";
 import { useUserStore } from "@/stores/user";
 import { ref } from "vue";
+// import UploadMedia from "../Media/UploadMedia.vue";
 
 const username = ref("");
 const password = ref("");
 const code = ref("");
 const profilePhoto = ref("");
+const side = ref("");
 const { createUser, loginUser, updateSession } = useUserStore();
 
 async function register() {
-  if (profilePhoto.value === "") {
-    return;
-  }
-  await createUser(username.value, password.value, code.value, profilePhoto.value);
+  // if (profilePhoto.value === "") {
+  //   return;
+  // }
+  await createUser(username.value, password.value, code.value, profilePhoto.value, side.value);
   await loginUser(username.value, password.value);
   await updateSession();
   void router.push({ name: "Home" });
@@ -33,12 +35,24 @@ async function assignURL(url: string) {
         <input v-model.trim="username" type="text" id="aligned-username" placeholder="Username" required />
       </div>
       <div class="pure-control-group">
-        <label for="aligned-username">Code</label>
-        <input v-model.trim="code" type="text" id="aligned-username" placeholder="***" required />
+        <label for="aligned-code">Code</label>
+        <input v-model.trim="code" type="text" id="aligned-code" placeholder="***" required />
       </div>
       <div class="pure-control-group">
         <label for="aligned-password">Password</label>
         <input type="password" v-model.trim="password" id="aligned-password" placeholder="Password" required />
+      </div>
+      <!-- <div class="pure-control-group">
+        <UploadMedia @update:imageURL="assignURL"></UploadMedia>
+      </div> -->
+      <div class="pure-control-group">
+        <label for="aligned-side">Side</label>
+        <select v-model="side" id="aligned-side" required>
+          <option value="" disabled>Select your side</option>
+          <option value="port">Port</option>
+          <option value="starboard">Starboard</option>
+          <option value="coxswain">Coxswain</option>
+        </select>
       </div>
       <div class="pure-controls">
         <button id="Register" type="submit" class="pure-button pure-button-primary">Register</button>

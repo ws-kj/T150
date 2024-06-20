@@ -61,8 +61,12 @@ export default class MeterConcept {
         totalMeter += workout.meter * 1;
       } else if (workout.type === "bikeerg") {
         totalMeter += workout.meter * 0.45;
+      } else if (workout.type === "cycling") {
+        totalMeter += workout.meter * 0.34;
       } else if (workout.type === "lift") {
         totalMeter += workout.meter * 5000;
+      } else if (workout.type === "swimming") {
+        totalMeter += workout.meter * 3;
       } else if (workout.type === "running") {
         totalMeter += workout.meter * 3;
       }

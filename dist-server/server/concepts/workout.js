@@ -25,16 +25,6 @@ class WorkoutConcept {
             return { msg: "Workout successfully created!", workout: yield this.workouts.readOne({ _id }) };
         });
     }
-    // async idsToPost(ids: ObjectId[]) {
-    //   console.log(ids);
-    //   console.log({ _id: { $in: ids } });
-    //   const posts = await this.posts.readMany({ _id: { $in: ids } });
-    //   console.log(posts);
-    //   // Store strings in Map because ObjectId comparison by reference is wrong
-    //   const idToPost = new Map(posts.map((post) => [post._id.toString(), post]));
-    //   console.log(idToPost);
-    //   return ids.map((id) => idToPost.get(id.toString())?.content ?? "DELETED_USER");
-    // }
     getWorkoutById(_id) {
         return __awaiter(this, void 0, void 0, function* () {
             const workout = yield this.workouts.readOne({ _id });
@@ -47,7 +37,7 @@ class WorkoutConcept {
     getWorkouts(query) {
         return __awaiter(this, void 0, void 0, function* () {
             const workouts = yield this.workouts.readMany(query, {
-                sort: { dateUpdated: -1 },
+                sort: { workoutDate: -1 },
             });
             return workouts;
         });
@@ -97,9 +87,17 @@ class WorkoutConcept {
             }
         });
     }
+    getRecentWeekWorkouts() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const oneWeekAgo = new Date();
+            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+            const workouts = yield this.getWorkouts({ workoutDate: { $gte: oneWeekAgo.toISOString().split("T")[0] } });
+            return workouts;
+        });
+    }
     sanitizeUpdate(update) {
         // Make sure the update cannot change the athlete.
-        const allowedUpdates = ["type", "meter"];
+        const allowedUpdates = ["type", "meter", "description"];
         for (const key in update) {
             if (!allowedUpdates.includes(key)) {
                 throw new errors_1.NotAllowedError(`Cannot update '${key}' field!`);

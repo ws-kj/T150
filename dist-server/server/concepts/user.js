@@ -29,10 +29,10 @@ class UserConcept {
     constructor() {
         this.users = new doc_1.default("users");
     }
-    create(username, password, profilePhoto, code) {
+    create(username, password, profilePhoto, code, side) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.canCreate(username, code);
-            const _id = yield this.users.createOne({ username: username, password: password, profilePhoto: profilePhoto });
+            const _id = yield this.users.createOne({ username: username, password: password, profilePhoto: profilePhoto, side });
             return { msg: "User created successfully!", user: yield this.getUserById(_id) };
         });
     }
@@ -133,7 +133,7 @@ class UserConcept {
             if (!username) {
                 throw new errors_1.BadValuesError("The username cannot be empty");
             }
-            if (code !== "WillOliver") {
+            if (code !== "123") {
                 throw new errors_1.NotAllowedError("Not correct passcode");
             }
             yield this.isUsernameUnique(username);

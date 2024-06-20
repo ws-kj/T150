@@ -19,17 +19,6 @@ export default class WorkoutConcept {
     return { msg: "Workout successfully created!", workout: await this.workouts.readOne({ _id }) };
   }
 
-  // async idsToPost(ids: ObjectId[]) {
-  //   console.log(ids);
-  //   console.log({ _id: { $in: ids } });
-  //   const posts = await this.posts.readMany({ _id: { $in: ids } });
-  //   console.log(posts);
-  //   // Store strings in Map because ObjectId comparison by reference is wrong
-  //   const idToPost = new Map(posts.map((post) => [post._id.toString(), post]));
-  //   console.log(idToPost);
-  //   return ids.map((id) => idToPost.get(id.toString())?.content ?? "DELETED_USER");
-  // }
-
   async getWorkoutById(_id: ObjectId) {
     const workout = await this.workouts.readOne({ _id });
     if (workout === null) {
@@ -40,7 +29,7 @@ export default class WorkoutConcept {
 
   async getWorkouts(query: Filter<WorkoutDoc>) {
     const workouts = await this.workouts.readMany(query, {
-      sort: { dateUpdated: -1 },
+      sort: { workoutDate: -1 },
     });
     return workouts;
   }
@@ -84,9 +73,16 @@ export default class WorkoutConcept {
     }
   }
 
+  async getRecentWeekWorkouts() {
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    const workouts = await this.getWorkouts({ workoutDate: { $gte: oneWeekAgo.toISOString().split("T")[0] } });
+    return workouts;
+  }
+
   private sanitizeUpdate(update: Partial<WorkoutDoc>) {
     // Make sure the update cannot change the athlete.
-    const allowedUpdates = ["type", "meter"];
+    const allowedUpdates = ["type", "meter", "description"];
     for (const key in update) {
       if (!allowedUpdates.includes(key)) {
         throw new NotAllowedError(`Cannot update '${key}' field!`);

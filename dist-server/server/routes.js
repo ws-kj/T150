@@ -101,10 +101,11 @@ let Routes = (() => {
                     return users;
                 });
             }
-            createUser(session, username, password, profilePhoto, code) {
+            createUser(session, username, password, profilePhoto, code, side) {
                 return __awaiter(this, void 0, void 0, function* () {
+                    console.log("here");
                     app_1.WebSession.isLoggedOut(session);
-                    const user = yield app_1.User.create(username, password, profilePhoto, code);
+                    const user = yield app_1.User.create(username, password, profilePhoto, code, side);
                     yield app_1.Meter.create(user.user.username);
                     return user.user;
                 });
@@ -118,11 +119,11 @@ let Routes = (() => {
             deleteUser(session) {
                 return __awaiter(this, void 0, void 0, function* () {
                     const user = app_1.WebSession.getUser(session);
-                    app_1.WebSession.end(session);
                     yield app_1.Workout.deleteByAthlete(user);
                     const username = (yield app_1.User.getUserById(user)).username;
                     yield app_1.PR.deleteByRower(username);
                     yield app_1.Meter.delete(username);
+                    app_1.WebSession.end(session);
                     return yield app_1.User.delete(user);
                 });
             }
@@ -143,6 +144,7 @@ let Routes = (() => {
             // Workouts
             getWorkouts(athlete) {
                 return __awaiter(this, void 0, void 0, function* () {
+                    console.log(athlete);
                     let workouts;
                     if (athlete) {
                         const id = (yield app_1.User.getUserByUsername(athlete))._id;
@@ -161,16 +163,7 @@ let Routes = (() => {
                     // Updating meters
                     const username = (yield app_1.User.getUserById(user)).username;
                     const workouts = yield app_1.Workout.getByAthlete(user);
-                    let totalMeter = 0;
-                    for (const workout of workouts) {
-                        if (workout.type === "erg") {
-                            totalMeter += workout.meter * 1;
-                        }
-                        else {
-                            totalMeter += workout.meter * 2;
-                        }
-                    }
-                    yield app_1.Meter.update(username, { meter: totalMeter });
+                    yield app_1.Meter.update(username, workouts);
                     return { msg: created.msg, post: yield responses_1.default.workout(created.workout) };
                 });
             }
@@ -182,16 +175,7 @@ let Routes = (() => {
                     // Updating meters
                     const username = (yield app_1.User.getUserById(user)).username;
                     const workouts = yield app_1.Workout.getByAthlete(user);
-                    let totalMeter = 0;
-                    for (const workout of workouts) {
-                        if (workout.type === "erg") {
-                            totalMeter += workout.meter * 1;
-                        }
-                        else {
-                            totalMeter += workout.meter * 2;
-                        }
-                    }
-                    yield app_1.Meter.update(username, { meter: totalMeter });
+                    yield app_1.Meter.update(username, workouts);
                     return;
                 });
             }
@@ -202,30 +186,15 @@ let Routes = (() => {
                     // Updating meters
                     const username = (yield app_1.User.getUserById(user)).username;
                     const workouts = yield app_1.Workout.getByAthlete(user);
-                    let totalMeter = 0;
-                    for (const workout of workouts) {
-                        if (workout.type === "erg") {
-                            totalMeter += workout.meter * 1;
-                        }
-                        else {
-                            totalMeter += workout.meter * 2;
-                        }
-                    }
-                    yield app_1.Meter.update(username, { meter: totalMeter });
+                    yield app_1.Meter.update(username, workouts);
                     return app_1.Workout.delete(_id);
                 });
             }
-            getMeter(session, athlete) {
+            getMeter(session) {
                 return __awaiter(this, void 0, void 0, function* () {
-                    let meter;
-                    if (athlete) {
-                        const id = (yield app_1.User.getUserByUsername(athlete))._id;
-                        meter = yield app_1.Workout.getTotalMeter(id);
-                    }
-                    else {
-                        const id = app_1.WebSession.getUser(session);
-                        meter = yield app_1.Workout.getTotalMeter(id);
-                    }
+                    const user = app_1.WebSession.getUser(session);
+                    const username = (yield app_1.User.getUserById(user)).username;
+                    const meter = app_1.Meter.getMeterByRower(username);
                     return meter;
                 });
             }
@@ -256,22 +225,6 @@ let Routes = (() => {
                     console.log(username);
                     const prs = yield app_1.PR.getByRower(username);
                     return prs;
-                });
-            }
-            updateMeters(user) {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const username = (yield app_1.User.getUserById(user)).username;
-                    const workouts = yield app_1.Workout.getByAthlete(user);
-                    let totalMeter = 0;
-                    for (const workout of workouts) {
-                        if (workout.type === "erg") {
-                            totalMeter += workout.meter * 1;
-                        }
-                        else {
-                            totalMeter += workout.meter * 2;
-                        }
-                    }
-                    yield app_1.Meter.update(username, { meter: totalMeter });
                 });
             }
             constructor() {

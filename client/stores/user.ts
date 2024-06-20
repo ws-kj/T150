@@ -19,9 +19,9 @@ export const useUserStore = defineStore(
       currentUserProfilePhoto.value = "";
     };
 
-    const createUser = async (username: string, password: string, code: string, profilePhoto: string) => {
+    const createUser = async (username: string, password: string, code: string, profilePhoto: string, side: string) => {
       await fetchy("/api/users", "POST", {
-        body: { username: username, password: password, profilePhoto: profilePhoto, code: code },
+        body: { username: username, password: password, profilePhoto: profilePhoto, code: code, side },
       });
     };
 
