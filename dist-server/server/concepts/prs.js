@@ -12,42 +12,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.WorkoutAthleteNotMatchError = void 0;
 const doc_1 = __importDefault(require("../framework/doc"));
 const errors_1 = require("./errors");
 class PRConcept {
     constructor() {
         this.prs = new doc_1.default("prs");
-        //   async getTotalMeter(athlete: ObjectId) {
-        //     const workouts = await this.workouts.readMany({ athlete });
-        //     let total = 0;
-        //     for (const workout of workouts) {
-        //       total += workout.meter;
+        // // Helper function to map PRs to proper formats
+        // private mapPRs(prs: PRDoc[]): PRDoc[] {
+        //   return prs.map((pr) => {
+        //     if (pr.type === "maxBenchPress" || pr.type === "maxSquat") {
+        //       // Keep weight as is
+        //     } else {
+        //       // Convert seconds to HH:MM:SS format
+        //       pr.pr = this.secondsToHHMMSS(pr.pr);
         //     }
-        //     return total;
-        //   }
-        //   async isAthlete(user: ObjectId, _id: ObjectId) {
-        //     const workout = await this.workouts.readOne({ _id });
-        //     if (!workout) {
-        //       throw new NotFoundError(`Workout ${_id} does not exist!`);
-        //     }
-        //     if (workout.athlete.toString() !== user.toString()) {
-        //       throw new WorkoutAthleteNotMatchError(user, _id);
-        //     }
-        //   }
-        //   private sanitizeUpdate(update: Partial<WorkoutDoc>) {
-        //     // Make sure the update cannot change the athlete.
-        //     const allowedUpdates = ["type", "meter"];
-        //     for (const key in update) {
-        //       if (!allowedUpdates.includes(key)) {
-        //         throw new NotAllowedError(`Cannot update '${key}' field!`);
-        //       }
-        //     }
-        //   }
+        //     return pr;
+        //   });
+        // }
     }
     create(rower, type, pr) {
         return __awaiter(this, void 0, void 0, function* () {
-            const _id = yield this.prs.createOne({ rower, type, pr });
+            const _id = yield this.prs.createOne({ rower, type, pr: this.parsePR(pr) });
             return { msg: "PR successfully submitted!", pr: yield this.prs.readOne({ _id }) };
         });
     }
@@ -60,20 +45,15 @@ class PRConcept {
             return pr;
         });
     }
-    getPRs(query) {
+    getPRsByType(type) {
         return __awaiter(this, void 0, void 0, function* () {
-            const prs = yield this.prs.readMany(query, {
-                sort: { pr: -1 },
-            });
+            const prs = yield this.prs.readMany({ type }, { sort: { pr: -1 } });
             return prs;
         });
     }
     getByRower(rower) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log("here");
-            console.log(rower);
             const pr = yield this.prs.readMany({ rower });
-            console.log(pr);
             if (pr === null) {
                 throw new errors_1.NotFoundError(`Rower not found!`);
             }
@@ -98,14 +78,42 @@ class PRConcept {
             return { msg: `PRs deleted successfully!` };
         });
     }
-}
-exports.default = PRConcept;
-class WorkoutAthleteNotMatchError extends errors_1.NotAllowedError {
-    constructor(author, _id) {
-        super("{0} is not the author of post {1}!", author, _id);
-        this.author = author;
-        this._id = _id;
+    // Helper function to compare PR values
+    comparePRs(pr1, pr2) {
+        const pr1Value = this.parsePR(pr1);
+        const pr2Value = this.parsePR(pr2);
+        if (pr1Value !== null && pr2Value !== null) {
+            return pr1Value - pr2Value;
+        }
+        return pr1.localeCompare(pr2);
+    }
+    // Helper function to parse PR values
+    parsePR(pr) {
+        if (/^\d{1,2}:\d{2}$/.test(pr)) {
+            // MM:SS format
+            const [minutes, seconds] = pr.split(":").map(Number);
+            return minutes * 60 + seconds;
+        }
+        else if (/^\d{1,2}:\d{2}:\d{2}$/.test(pr)) {
+            // HH:MM:SS format
+            const [hours, minutes, seconds] = pr.split(":").map(Number);
+            return hours * 3600 + minutes * 60 + seconds;
+        }
+        else if (/^\d+(\.\d+)?$/.test(pr)) {
+            // Weight format
+            return parseFloat(pr);
+        }
+        else {
+            return 0;
+        }
+    }
+    // Helper function to convert seconds to HH:MM:SS format
+    secondsToHHMMSS(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = seconds % 60;
+        return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
     }
 }
-exports.WorkoutAthleteNotMatchError = WorkoutAthleteNotMatchError;
+exports.default = PRConcept;
 //# sourceMappingURL=prs.js.map

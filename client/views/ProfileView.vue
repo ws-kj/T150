@@ -4,7 +4,7 @@ import { fetchy } from "@/utils/fetchy";
 import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
 import router from "@/router";
-import PRViewComponent from "../components/Record/PRViewComponent.vue";
+// import PRForm from "../components/Record/PRForm.vue";
 
 const { currentUsername, isLoggedIn, currentSide } = storeToRefs(useUserStore());
 const { deleteUser } = useUserStore();
@@ -44,12 +44,13 @@ onBeforeMount(async () => {
         <p>Total meters: {{ totalMeter }}</p>
         <button class="button-error pure-button" @click="showConfirmModal = true">Delete User</button>
       </div>
-      <div class="pr-list">
+      <!-- <PRForm /> -->
+      <!-- <div class="pr-list">
         <h3>Personal Records</h3>
         <article v-for="pr in PRs" :key="pr._id" class="pr-item">
           <PRViewComponent :pr="pr" />
         </article>
-      </div>
+      </div> -->
     </div>
 
     <div v-if="showConfirmModal" class="modal-overlay" @click.self="showConfirmModal = false">
@@ -60,13 +61,6 @@ onBeforeMount(async () => {
         <button @click="showConfirmModal = false" class="cancel-button"><i class="fas fa-times"></i> No</button>
       </div>
     </div>
-
-    <!-- <div class="forms-wrapper">
-      <TwoKForm />
-      <SixKForm />
-      <BenchPressForm />
-      <SquatForm />
-    </div> -->
   </div>
 </template>
 

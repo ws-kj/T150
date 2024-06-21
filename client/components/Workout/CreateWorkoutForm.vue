@@ -5,6 +5,7 @@ import { defineEmits } from "vue";
 
 const type = ref("");
 const meter = ref(0);
+const unit = ref("meters");
 const workoutDate = ref("");
 const description = ref("");
 const error = ref("");
@@ -14,11 +15,22 @@ const isLiftSession = computed(() => type.value === "lift");
 
 const validateInput = () => {
   if (!Number.isInteger(meter.value) || meter.value <= 0) {
-    error.value = "Meter or sessions must be a positive integer.";
+    error.value = "Distance or sessions must be a positive integer.";
     return false;
   }
   error.value = "";
   return true;
+};
+
+const convertToMeters = (value: number, unit: string) => {
+  switch (unit) {
+    case "kilometers":
+      return value * 1000;
+    case "miles":
+      return value * 1609.34;
+    default:
+      return value;
+  }
 };
 
 const createWorkout = async () => {
@@ -26,9 +38,11 @@ const createWorkout = async () => {
     return;
   }
 
+  const meterInMeters = convertToMeters(meter.value, unit.value);
+
   try {
     await fetchy("/api/workouts", "POST", {
-      body: { type: type.value, meter: meter.value, workoutDate: workoutDate.value, description: description.value },
+      body: { type: type.value, meter: meterInMeters, workoutDate: workoutDate.value, description: description.value },
     });
     emit("refreshWorkouts");
     emptyForm();
@@ -40,6 +54,7 @@ const createWorkout = async () => {
 const emptyForm = () => {
   type.value = "";
   meter.value = 0;
+  unit.value = "meters";
   workoutDate.value = "";
   description.value = "";
   error.value = "";
@@ -65,8 +80,15 @@ const emptyForm = () => {
     </div>
 
     <div v-if="!isLiftSession" class="form-group">
-      <label for="meter"> <i class="fas fa-clock-o"></i> Meter: </label>
-      <input id="meter" type="number" v-model.number="meter" placeholder="Enter meter" required />
+      <label for="meter"> <i class="fas fa-clock-o"></i> Distance: </label>
+      <div class="input-group">
+        <input id="meter" type="number" v-model.number="meter" placeholder="Enter distance" required />
+        <select v-model="unit" class="unit-select">
+          <option value="meters">Meters</option>
+          <option value="kilometers">Kilometers</option>
+          <option value="miles">Miles</option>
+        </select>
+      </div>
     </div>
 
     <div v-else class="form-group">
@@ -95,13 +117,13 @@ const emptyForm = () => {
         <p>Follow these steps to log your workouts:</p>
         <ol>
           <li>Select the workout type from the dropdown menu.</li>
-          <li>Enter the meter of your workout, everything must be enter in meter.</li>
+          <li>Enter the distance of your workout.</li>
           <li>If you are entering a lift session, just enter 1. 1 lift session is at least half an hour.</li>
           <li>Select the workout date.</li>
           <li>Provide a description (optional).</li>
           <li>Click "Add" to log your workout.</li>
         </ol>
-        <p>Conversion metrics</p>
+        <p>Conversion metrics:</p>
         <ol>
           <li>1m running = 1.5m erging</li>
           <li>1m single = 1.5m erging</li>
@@ -180,8 +202,14 @@ h2 {
   height: 100px;
 }
 
-#error {
-  height: auto;
+.input-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.unit-select {
+  width: 100px;
 }
 
 .error-message {
