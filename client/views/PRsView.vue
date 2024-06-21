@@ -19,8 +19,8 @@ const selectedPRType = ref("2kErgTest");
           <option value="6kErgTest">6k Erg Test</option>
           <option value="halfMarathon">Half Marathon Erg</option>
           <option value="fullMarathon">Full Marathon Erg</option>
-          <option value="oneMileRun">1 Mile Run</option>
-          <option value="fiveKRun">5k Run</option>
+          <option value="1mRun">1 Mile Run</option>
+          <option value="5kRun">5k Run</option>
           <option value="maxBenchPress">Max Bench Press</option>
           <option value="maxSquat">Max Squat</option>
         </select>
