@@ -16,7 +16,7 @@ const selectedPRType = ref("2kErgTest");
         <label for="prType">Select PR Type:</label>
         <select id="prType" v-model="selectedPRType">
           <option value="2kErgTest">2k Erg Test</option>
-          <option value="sixk">6k Erg Test</option>
+          <option value="6kErgTest">6k Erg Test</option>
           <option value="halfMarathon">Half Marathon Erg</option>
           <option value="fullMarathon">Full Marathon Erg</option>
           <option value="oneMileRun">1 Mile Run</option>
