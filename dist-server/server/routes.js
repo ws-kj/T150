@@ -68,7 +68,6 @@ let Routes = (() => {
     let _getMeter_decorators;
     let _getAllMeter_decorators;
     let _postPR_decorators;
-    let _getPRs_decorators;
     let _getPRsByUsername_decorators;
     return _a = class Routes {
             getSessionUser(session) {
@@ -212,12 +211,11 @@ let Routes = (() => {
                     return created;
                 });
             }
-            getPRs(type) {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const prs = yield app_1.PR.getPRs({ type });
-                    return prs;
-                });
-            }
+            // @Router.get("/prs/:type")
+            // async getPRs(type: string) {
+            //   const prs = await PR.getPRs({ type });
+            //   return prs;
+            // }
             getPRsByUsername(session) {
                 return __awaiter(this, void 0, void 0, function* () {
                     console.log("here");
@@ -250,7 +248,6 @@ let Routes = (() => {
             _getMeter_decorators = [router_1.Router.get("/meter")];
             _getAllMeter_decorators = [router_1.Router.get("/ranking")];
             _postPR_decorators = [router_1.Router.post("/prs/:type")];
-            _getPRs_decorators = [router_1.Router.get("/prs/:type")];
             _getPRsByUsername_decorators = [router_1.Router.get("/prs")];
             __esDecorate(_a, null, _getSessionUser_decorators, { kind: "method", name: "getSessionUser", static: false, private: false, access: { has: obj => "getSessionUser" in obj, get: obj => obj.getSessionUser }, metadata: _metadata }, null, _instanceExtraInitializers);
             __esDecorate(_a, null, _getUsers_decorators, { kind: "method", name: "getUsers", static: false, private: false, access: { has: obj => "getUsers" in obj, get: obj => obj.getUsers }, metadata: _metadata }, null, _instanceExtraInitializers);
@@ -268,7 +265,6 @@ let Routes = (() => {
             __esDecorate(_a, null, _getMeter_decorators, { kind: "method", name: "getMeter", static: false, private: false, access: { has: obj => "getMeter" in obj, get: obj => obj.getMeter }, metadata: _metadata }, null, _instanceExtraInitializers);
             __esDecorate(_a, null, _getAllMeter_decorators, { kind: "method", name: "getAllMeter", static: false, private: false, access: { has: obj => "getAllMeter" in obj, get: obj => obj.getAllMeter }, metadata: _metadata }, null, _instanceExtraInitializers);
             __esDecorate(_a, null, _postPR_decorators, { kind: "method", name: "postPR", static: false, private: false, access: { has: obj => "postPR" in obj, get: obj => obj.postPR }, metadata: _metadata }, null, _instanceExtraInitializers);
-            __esDecorate(_a, null, _getPRs_decorators, { kind: "method", name: "getPRs", static: false, private: false, access: { has: obj => "getPRs" in obj, get: obj => obj.getPRs }, metadata: _metadata }, null, _instanceExtraInitializers);
             __esDecorate(_a, null, _getPRsByUsername_decorators, { kind: "method", name: "getPRsByUsername", static: false, private: false, access: { has: obj => "getPRsByUsername" in obj, get: obj => obj.getPRsByUsername }, metadata: _metadata }, null, _instanceExtraInitializers);
             if (_metadata) Object.defineProperty(_a, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });
         })(),

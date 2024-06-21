@@ -147,11 +147,11 @@ class Routes {
     return created;
   }
 
-  @Router.get("/prs/:type")
-  async getPRs(type: string) {
-    const prs = await PR.getPRs({ type });
-    return prs;
-  }
+  // @Router.get("/prs/:type")
+  // async getPRs(type: string) {
+  //   const prs = await PR.getPRs({ type });
+  //   return prs;
+  // }
 
   @Router.get("/prs")
   async getPRsByUsername(session: WebSessionDoc) {
