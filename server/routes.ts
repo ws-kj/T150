@@ -59,6 +59,7 @@ class Routes {
     const username = (await User.getUserById(user)).username;
     await PR.deleteByRower(username);
     await Meter.delete(username);
+    await PR.deleteByRower(username);
     WebSession.end(session);
     return await User.delete(user);
   }
@@ -140,25 +141,21 @@ class Routes {
   }
 
   @Router.post("/prs/:type")
-  async postPR(session: WebSessionDoc, type: string, pr: string) {
+  async postPR(session: WebSessionDoc, type: string, date: string, pr: string) {
     const user = WebSession.getUser(session);
     const username = (await User.getUserById(user)).username;
-    const created = await PR.create(username, type, pr);
+    const created = await PR.addOrUpdate(username, type, date, Number(pr));
     return created;
   }
 
-  // @Router.get("/prs/:type")
-  // async getPRs(type: string) {
-  //   const prs = await PR.getPRs({ type });
-  //   return prs;
-  // }
+  @Router.get("/prs/ranking/:type")
+  async getPRs(type: string) {
+    const prs = await PR.getPRsByType(type);
+    return prs;
+  }
 
-  @Router.get("/prs")
-  async getPRsByUsername(session: WebSessionDoc) {
-    console.log("here");
-    const user = WebSession.getUser(session);
-    const username = (await User.getUserById(user)).username;
-    console.log(username);
+  @Router.get("/prs/:username")
+  async getPRsByUsername(username: string) {
     const prs = await PR.getByRower(username);
     return prs;
   }

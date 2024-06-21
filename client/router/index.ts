@@ -8,6 +8,7 @@ import NotFoundView from "../views/NotFoundView.vue";
 import ProfileView from "../views/ProfileView.vue";
 import SettingsView from "../views/SettingsView.vue";
 import RankingView from "@/views/RankingView.vue";
+import PRsView from "@/views/PRsView.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -45,6 +46,12 @@ const router = createRouter({
       path: "/ranking",
       name: "Ranking",
       component: RankingView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/pr",
+      name: "PRs",
+      component: PRsView,
       meta: { requiresAuth: true },
     },
     {

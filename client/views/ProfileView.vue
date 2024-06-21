@@ -4,7 +4,8 @@ import { fetchy } from "@/utils/fetchy";
 import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
 import router from "@/router";
-// import PRForm from "../components/Record/PRForm.vue";
+import PRForm from "../components/Record/PRForm.vue";
+import PRViewComponent from "@/components/Record/PRViewComponent.vue";
 
 const { currentUsername, isLoggedIn, currentSide } = storeToRefs(useUserStore());
 const { deleteUser } = useUserStore();
@@ -18,7 +19,7 @@ const side = ref(currentSide.value);
 async function fetchData() {
   try {
     totalMeter.value = await fetchy("/api/meter", "GET");
-    PRs.value = await fetchy("/api/prs", "GET");
+    PRs.value = await fetchy(`/api/prs/${currentUsername.value}`, "GET");
   } catch (e) {
     console.log(e);
   }
@@ -44,13 +45,13 @@ onBeforeMount(async () => {
         <p>Total meters: {{ totalMeter }}</p>
         <button class="button-error pure-button" @click="showConfirmModal = true">Delete User</button>
       </div>
-      <!-- <PRForm /> -->
-      <!-- <div class="pr-list">
+      <PRForm />
+      <div class="pr-list">
         <h3>Personal Records</h3>
-        <article v-for="pr in PRs" :key="pr._id" class="pr-item">
-          <PRViewComponent :pr="pr" />
+        <article v-for="PR in PRs" :key="PR._id" class="pr-item">
+          <PRViewComponent :PR="PR" />
         </article>
-      </div> -->
+      </div>
     </div>
 
     <div v-if="showConfirmModal" class="modal-overlay" @click.self="showConfirmModal = false">

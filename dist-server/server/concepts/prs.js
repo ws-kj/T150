@@ -17,23 +17,18 @@ const errors_1 = require("./errors");
 class PRConcept {
     constructor() {
         this.prs = new doc_1.default("prs");
-        // // Helper function to map PRs to proper formats
-        // private mapPRs(prs: PRDoc[]): PRDoc[] {
-        //   return prs.map((pr) => {
-        //     if (pr.type === "maxBenchPress" || pr.type === "maxSquat") {
-        //       // Keep weight as is
-        //     } else {
-        //       // Convert seconds to HH:MM:SS format
-        //       pr.pr = this.secondsToHHMMSS(pr.pr);
-        //     }
-        //     return pr;
-        //   });
-        // }
     }
-    create(rower, type, pr) {
+    addOrUpdate(rower, type, date, pr) {
         return __awaiter(this, void 0, void 0, function* () {
-            const _id = yield this.prs.createOne({ rower, type, pr: this.parsePR(pr) });
-            return { msg: "PR successfully submitted!", pr: yield this.prs.readOne({ _id }) };
+            const oldPR = yield this.prs.readOne({ rower, type });
+            if (oldPR === null) {
+                const _id = yield this.prs.createOne({ rower, type, date, pr });
+                return { msg: "PR successfully submitted!", pr: yield this.prs.readOne({ _id }) };
+            }
+            else {
+                yield this.prs.updateOne({ _id: oldPR._id }, { date, pr });
+                return { msg: "PR successfully updated!" };
+            }
         });
     }
     getPRById(_id) {
@@ -47,8 +42,12 @@ class PRConcept {
     }
     getPRsByType(type) {
         return __awaiter(this, void 0, void 0, function* () {
-            const prs = yield this.prs.readMany({ type }, { sort: { pr: -1 } });
-            return prs;
+            if (type === "maxBenchPress" || type === "maxSquat") {
+                return yield this.prs.readMany({ type }, { sort: { pr: -1 } });
+            }
+            else {
+                return yield this.prs.readMany({ type }, { sort: { pr: 1 } });
+            }
         });
     }
     getByRower(rower) {
@@ -58,12 +57,6 @@ class PRConcept {
                 throw new errors_1.NotFoundError(`Rower not found!`);
             }
             return pr;
-        });
-    }
-    update(_id, update) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.prs.updateOne({ _id }, update);
-            return { msg: "PR successfully updated!" };
         });
     }
     delete(_id) {
@@ -78,41 +71,16 @@ class PRConcept {
             return { msg: `PRs deleted successfully!` };
         });
     }
-    // Helper function to compare PR values
-    comparePRs(pr1, pr2) {
-        const pr1Value = this.parsePR(pr1);
-        const pr2Value = this.parsePR(pr2);
-        if (pr1Value !== null && pr2Value !== null) {
-            return pr1Value - pr2Value;
-        }
-        return pr1.localeCompare(pr2);
-    }
-    // Helper function to parse PR values
-    parsePR(pr) {
-        if (/^\d{1,2}:\d{2}$/.test(pr)) {
-            // MM:SS format
-            const [minutes, seconds] = pr.split(":").map(Number);
-            return minutes * 60 + seconds;
-        }
-        else if (/^\d{1,2}:\d{2}:\d{2}$/.test(pr)) {
-            // HH:MM:SS format
-            const [hours, minutes, seconds] = pr.split(":").map(Number);
-            return hours * 3600 + minutes * 60 + seconds;
-        }
-        else if (/^\d+(\.\d+)?$/.test(pr)) {
-            // Weight format
-            return parseFloat(pr);
-        }
-        else {
-            return 0;
-        }
-    }
-    // Helper function to convert seconds to HH:MM:SS format
-    secondsToHHMMSS(seconds) {
-        const hours = Math.floor(seconds / 3600);
-        const minutes = Math.floor((seconds % 3600) / 60);
-        const secs = seconds % 60;
-        return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+    existsPR(rower, type) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const results = yield this.prs.readMany({ rower, type });
+            if (results === null) {
+                return false;
+            }
+            else {
+                return true;
+            }
+        });
     }
 }
 exports.default = PRConcept;

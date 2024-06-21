@@ -1,21 +1,47 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
-const props = defineProps(["pr"]);
+const props = defineProps(["PR"]);
 
-// Function to get the name based on the type
 const prName = computed(() => {
-  switch (props.pr.type) {
-    case "twok":
-      return "2k";
-    case "swim":
-      return "Swimming Personal Record";
-    case "bike":
-      return "Cycling Personal Record";
-    case "lift":
-      return "Weightlifting Personal Record";
+  if (!props.PR || !props.PR.type) {
+    return "Personal Record";
+  }
+  switch (props.PR.type) {
+    case "2kErgTest":
+      return "2k Erg Test";
+    case "6kErgTest":
+      return "6k Erg Test";
+    case "halfMarathon":
+      return "Half Marathon Erg";
+    case "fullMarathon":
+      return "Full Marathon Erg";
+    case "1mRun":
+      return "1 Mile Run";
+    case "5kRun":
+      return "5k Run";
+    case "maxBenchPress":
+      return "Max Bench Press";
+    case "maxSquat":
+      return "Max Squat";
     default:
       return "Personal Record";
+  }
+});
+
+const convertToHHMMSS = (seconds: number) => {
+  const hrs = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+
+  return `${String(hrs).padStart(2, "0")}:${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+};
+
+const prValue = computed(() => {
+  if (["maxBenchPress", "maxSquat"].includes(props.PR.type)) {
+    return props.PR.pr;
+  } else {
+    return convertToHHMMSS(Number(props.PR.pr));
   }
 });
 </script>
@@ -23,7 +49,9 @@ const prName = computed(() => {
 <template>
   <div class="pr-card">
     <h2>{{ prName }}</h2>
-    <p class="pr-value">{{ pr.pr }}</p>
+    <p>{{ props.PR.rower }}</p>
+    <p class="pr-date">Date: {{ props.PR.date }}</p>
+    <p class="pr-value">Value: {{ prValue }}</p>
   </div>
 </template>
 
@@ -52,6 +80,7 @@ body {
   color: #00796b; /* Athletic theme color */
 }
 
+.pr-card .pr-date,
 .pr-card .pr-value {
   font-size: 1.2em;
   color: #555;

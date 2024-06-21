@@ -10,7 +10,6 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
 <template>
   <main>
     <MeterListComponent v-if="isLoggedIn" />
-    <!-- <TwoKListComponent v-if="isLoggedIn" /> -->
   </main>
 </template>
 

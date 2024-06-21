@@ -40,6 +40,7 @@ onBeforeMount(async () => {
         <div class="dropdown-content">
           <RouterLink v-if="isLoggedIn" :to="{ name: 'Home' }" :class="{ underline: currentRouteName == 'Home' }">Home</RouterLink>
           <RouterLink v-if="isLoggedIn" :to="{ name: 'Ranking' }">Ranking</RouterLink>
+          <RouterLink v-if="isLoggedIn" :to="{ name: 'PRs' }">PRs</RouterLink>
           <RouterLink v-if="isLoggedIn" :to="{ name: 'Profile', params: { username: currentUsername } }" :class="{ underline: currentRouteName == 'Profile' }">Profile</RouterLink>
           <button v-if="isLoggedIn" class="pure-button pure-button-primary" @click="logout">Logout</button>
           <RouterLink v-if="!isLoggedIn" :to="{ name: 'Login' }" :class="{ underline: currentRouteName == 'Login' }">Login</RouterLink>

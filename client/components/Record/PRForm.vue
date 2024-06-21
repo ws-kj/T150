@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
-// import { fetchy } from "../../utils/fetchy";
+import { fetchy } from "../../utils/fetchy";
 
 const recordDate = ref("");
 const recordType = ref("2kErgTest");
@@ -15,28 +15,40 @@ const longTimeBasedRecords = ["halfMarathon", "fullMarathon"];
 const isTimeBased = computed(() => timeBasedRecords.includes(recordType.value));
 const isLongTimeBased = computed(() => longTimeBasedRecords.includes(recordType.value));
 
-const submitRecord = async () => {
-  let value;
-  if (isLongTimeBased.value) {
-    value = `${String(recordHours.value).padStart(2, "0")}:${String(recordMinutes.value).padStart(2, "0")}:${String(recordSeconds.value).padStart(2, "0")}`;
+const convertToSeconds = (value: string, isLongFormat: boolean) => {
+  if (isLongFormat) {
+    const [hours, minutes, seconds] = value.split(":").map(Number);
+    return hours * 3600 + minutes * 60 + seconds;
   } else {
-    value = recordValue.value;
+    const [minutes, seconds] = value.split(":").map(Number);
+    return minutes * 60 + seconds;
+  }
+};
+
+const submitRecord = async () => {
+  let valueInSeconds;
+  if (isLongTimeBased.value) {
+    valueInSeconds = recordHours.value * 3600 + recordMinutes.value * 60 + recordSeconds.value;
+  } else if (isTimeBased.value) {
+    valueInSeconds = convertToSeconds(recordValue.value, false);
+  } else {
+    valueInSeconds = recordValue.value; // keep the weight as is
   }
 
   const payload = {
     date: recordDate.value,
     type: recordType.value,
-    value: value,
+    value: valueInSeconds,
   };
 
   console.log(payload);
-  // try {
-  //   await fetchy("/api/prs", "POST", {
-  //     body: payload,
-  //   });
-  // } catch (_) {
-  //   return;
-  // }
+  try {
+    await fetchy(`/api/prs/${recordType.value}`, "POST", {
+      body: { date: recordDate.value, pr: valueInSeconds },
+    });
+  } catch (_) {
+    return;
+  }
   emptyForm();
 };
 
