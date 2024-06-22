@@ -3,7 +3,7 @@ import { useUserStore } from "@/stores/user";
 import { formatDate } from "@/utils/formatDate";
 import { storeToRefs } from "pinia";
 import { fetchy } from "../../utils/fetchy";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 
 const props = defineProps(["workout"]);
 const emit = defineEmits(["editWorkout", "refreshWorkouts"]);
@@ -19,6 +19,31 @@ const deleteWorkout = async () => {
   emit("refreshWorkouts");
   showConfirmModal.value = false;
 };
+
+const workoutIcon = computed(() => {
+  switch (props.workout.type) {
+    case "single":
+      return "fa-solid fa-sailboat";
+    case "double/pair":
+      return "fa-solid fa-sailboat";
+    case "eight":
+      return "fa-solid fa-sailboat";
+    case "erg":
+      return "fa-running";
+    case "running":
+      return "fa-running";
+    case "cycling":
+      return "fa-bicycle";
+    case "bikeerg":
+      return "fa-biking";
+    case "swimming":
+      return "fa-swimmer";
+    case "lift":
+      return "fa-dumbbell";
+    default:
+      return "fa-dumbbell";
+  }
+});
 </script>
 
 <template>
@@ -26,10 +51,10 @@ const deleteWorkout = async () => {
     <div class="workout-details">
       <div class="athlete-type">
         <p class="athlete">{{ props.workout.athlete }}</p>
-        <p class="workout-type"><i class="fas fa-dumbbell"></i> {{ props.workout.type }}</p>
+        <p class="workout-type"><i :class="['fas', workoutIcon]"></i> {{ props.workout.type }}</p>
       </div>
-      <p class="meter"><i class="fas fa-running"></i> {{ props.workout.meter }}</p>
-      <p class="description"><i class="fas fa-pen"></i> {{ props.workout.description }}</p>
+      <p class="meter"><i class="fas fa-road"></i> {{ Math.floor(props.workout.meter) }} meters</p>
+      <p class="description"><i class="fas fa-sticky-note"></i> {{ props.workout.description }}</p>
     </div>
     <div class="actions">
       <menu v-if="props.workout.athlete == currentUsername">

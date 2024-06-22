@@ -64,7 +64,7 @@ const emptyForm = () => {
 
 <template>
   <form class="record-form">
-    <h2>Enter Your Personal Record</h2>
+    <h2>Add or Update Your Personal Record</h2>
     <div class="form-group">
       <label for="recordType">Type of Record</label>
       <select id="recordType" v-model="recordType" required>

@@ -34,7 +34,13 @@ const convertToHHMMSS = (seconds: number) => {
   const mins = Math.floor((seconds % 3600) / 60);
   const secs = seconds % 60;
 
-  return `${String(hrs).padStart(2, "0")}:${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+  const formattedSecs = secs.toFixed(1);
+
+  if (hrs > 0) {
+    return `${hrs}:${String(mins).padStart(2, "0")}:${String(formattedSecs).padStart(4, "0")}`;
+  } else {
+    return `${mins}:${String(formattedSecs).padStart(4, "0")}`;
+  }
 };
 
 const prValue = computed(() => {

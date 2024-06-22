@@ -14,8 +14,8 @@ const emit = defineEmits(["refreshWorkouts"]);
 const isLiftSession = computed(() => type.value === "lift");
 
 const validateInput = () => {
-  if (!Number.isInteger(meter.value) || meter.value <= 0) {
-    error.value = "Distance or sessions must be a positive integer.";
+  if (meter.value <= 0) {
+    error.value = "Distance or sessions must be a positive number.";
     return false;
   }
   error.value = "";
@@ -82,7 +82,7 @@ const emptyForm = () => {
     <div v-if="!isLiftSession" class="form-group">
       <label for="meter"> <i class="fas fa-clock-o"></i> Distance: </label>
       <div class="input-group">
-        <input id="meter" type="number" v-model.number="meter" placeholder="Enter distance" required />
+        <input id="meter" type="number" step="0.01" v-model.number="meter" placeholder="Enter distance" required />
         <select v-model="unit" class="unit-select">
           <option value="meters">Meters</option>
           <option value="kilometers">Kilometers</option>
