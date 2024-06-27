@@ -92,6 +92,7 @@ h1 {
 }
 
 .box {
+  margin-top: 1em;
   background-color: rgba(255, 255, 255, 0.8); /* White with slight transparency */
   border-radius: 15px;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
@@ -112,7 +113,7 @@ h1 {
   position: absolute;
   top: -30px;
   background-color: #0044cc; /* Deep blue for the icon container */
-  border-radius: 50%;
+  border-radius: 15px;
   padding: 10px;
   color: white;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
